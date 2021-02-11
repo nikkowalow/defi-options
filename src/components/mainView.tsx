@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, Play, OptionChain } from '.';
-import {Coin} from '../models/coin'
+import { Coin } from '../models/coin'
 import { connect } from '../solanaHelperMethods';
 import { StatsModel } from '../statsModel';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -22,15 +22,15 @@ interface MainViewState {
 
 export class MainView extends React.Component<any, MainViewState> {
     constructor(props) {
-        super (props)
+        super(props)
 
         this.state = {
             authenticated: false,
             images: [mountains, beach],
-    
+
         } as MainViewState;
     }
- 
+
 
     async componentDidMount() {
         await connect();
@@ -71,10 +71,6 @@ export class MainView extends React.Component<any, MainViewState> {
 
                         <Route path="/connect">
                             <ConnectWallet onSubmit={this.onSubmit} />
-                        </Route>
-
-                        <Route path="/play">
-                            <Play />
                         </Route>
                         <Route path="/coins">
                             <Coins onSelect={this.onCoinSelect} />
