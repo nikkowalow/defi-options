@@ -42,8 +42,8 @@ export class Coin {
             });
     }
 
-    static parse(obect: Object): Coin {
-        let coin: Coin = obect as Coin;
+    static parse(object: Object): Coin {
+        let coin: Coin = object as Coin;
         return new Coin(coin.id, coin.logo, coin.name, coin.symbol, coin.description)
     } 
 }

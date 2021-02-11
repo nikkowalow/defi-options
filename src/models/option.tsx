@@ -21,17 +21,62 @@ abstract class OptionTypeModel {
         this.optionPrice = optionPrice;
     }
 
-    generateGreeks(optionPrice: number): void {
-        
+    //Implemented per call/pull
+    abstract calculateFairPrice(): number;
+
+    //Implemented per call/pull
+    abstract calculateDelta(): number;
+
+    calculateGamma(): number {
+        return -1;
     }
+
+    //Vega calculated from partial derivative of black scholes, same for calls and puts
+    calculateVega(): number {
+        return -1;
+    }
+
+    abstract calculateTheta(): number;
+
+    abstract calculateRho(): number;
 }
 
 export class CallModel extends OptionTypeModel {
-    
+    //Black scholes for calls
+    calculateFairPrice(): number {
+        return -1;
+    }
+
+    calculateDelta(): number {
+        return -1;
+    }
+
+    calculateTheta(): number {
+        return -1;
+    }
+
+    calculateRho(): number {
+        return -1;
+    }
 }
 
 export class PutModel extends OptionTypeModel {
+    //Black scholes for puts
+    calculateFairPrice(): number {
+        return -1;
+    }
 
+    calculateDelta(): number {
+        return -1;
+    }
+
+    calculateTheta(): number {
+        return -1;
+    }
+
+    calculateRho(): number {
+        return -1;
+    }
 }
 
 
