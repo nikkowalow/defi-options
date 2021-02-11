@@ -1,24 +1,82 @@
-import React, { Component } from 'react';
-import {Call, DefiOption, Put} from '../models/option'
-import {Container, Row, Col} from 'react-bootstrap'
+import React from 'react';
+import rp from 'request-promise';
+import * as config from '../configs/config.json';
+import { useTable } from 'react-table';
+import { CoinInfo, CoinsState } from './coins'
 
-export class Option extends Component<{option: DefiOption}, {}> {
-  render() {
-    let call: Call = this.props.option.call
-    let put: Put = this.props.option.put
+import { Link } from 'react-router-dom';
+import { throws } from 'assert';
+import { timeStamp } from 'console';
+
+interface OptionProps {
+  coin?: CoinInfo;
+}
+
+
+
+
+export class Option extends React.Component<OptionProps> {
+
+
+
+
+
+
+  makeOption() {
     return (
-      <Container>
-        <Row>
-          <Col></Col>
-          <Col></Col>
-          <Col></Col>
-          <Col></Col>
-          <Col></Col>
-          <Col></Col>
-          <Col></Col>
-          <Col></Col>
-        </Row>
-      </Container>
+      <table>
+        <thead>
+          <tr >
+            <th>Strike</th>
+            <th>Delta</th>
+            <th>Gamma</th>
+            <th>Theta</th>
+            <th>Rho</th>
+            <th>Vega</th>
+            <th>Change</th>
+            <th>% Change</th>
+            <th>Volume</th>
+            <th>Interest</th>
+            <th>Imp. Vol</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+          </tr>
+          <tr>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+          </tr>
+          <tr>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+          </tr>
+          <tr>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+            <td>Item</td>
+          </tr>
+        </tbody>
+      </table >
+    );
+  }
+
+
+  render() {
+    return (
+      <div className="options-container">
+        {this.makeOption()}
+      </div >
     );
   }
 }
+
