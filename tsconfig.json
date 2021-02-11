@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "types": [
-      "node",
-      "buffer-layout"
-    ],
     "lib": [
       "dom",
       "dom.iterable",
@@ -27,7 +23,8 @@
   },
   "include": [
     "src",
-    "src/node_modules"
+    "src/*",
+    "src/typings"
   ],
   "jest": {
     "verbose": true,

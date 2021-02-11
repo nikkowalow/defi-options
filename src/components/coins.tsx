@@ -3,7 +3,6 @@ import rp from 'request-promise';
 import * as config from '../configs/config.json';
 
 import { Link, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { Options } from '.';
 
 export interface CoinInfo {
     id: string;
