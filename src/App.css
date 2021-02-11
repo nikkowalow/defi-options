@@ -259,6 +259,11 @@
 
 .options-container {
   flex: 1;
+  font-size: 30px;
+}
+
+.options-chain {
+  font-size: 15px;
 }
 
 .options-header {
