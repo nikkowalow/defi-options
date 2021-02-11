@@ -1,7 +1,7 @@
 import React from 'react';
 import rp from 'request-promise';
 import * as config from '../configs/config.json';
-
+import { useTable } from 'react-table';
 import { CoinInfo, CoinsState } from './coins'
 import { Option } from '.'
 

@@ -1,0 +1,25 @@
+{
+    "CMC": {
+        "apiKey": "7c7ad878-dfbf-4ace-8758-9240ecee31a7",
+        "coinIDs": {
+            "BTC": "1",
+            "ETH": "1027",
+            "SOL": "5426",
+            "USDT": "825",
+            "DOT": "6636",
+            "LINK": "1975",
+            "ADA": "2010",
+            "LTC": "2",
+            "UNI": "7083",
+            "AVAX": "5805",
+            "NEM": "873"
+        },
+        "currencyConversion": "SOL",
+        "URL":{
+            "latestListings": "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest",
+            "info": "https://pro-api.coinmarketcap.com/v2/cryptocurrency/info",
+            "quote": "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+        }
+
+    }
+}

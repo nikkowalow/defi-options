@@ -1,0 +1,270 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+/* @keyframes App-logo-spin {
+  from {
+    transform: rotate(300deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} */
+
+.vote-button {
+  font-size: 20px;
+  padding: 15px;
+  margin: 15px;
+}
+
+.stats {
+  font-size: 14px;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  margin: 2px;
+  margin-right: 8px;
+}
+
+.navigation-bar-links {
+  top: 0px;
+  right: 0px;
+  position: absolute;
+  font-size: 15px;
+  margin: 3px;
+}
+
+.navigation-bar-logo {
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  width: 75px;
+  margin: 3px;
+}
+
+.form {
+  position: relative;
+  z-index: 1;
+  background: #272727;
+  max-width: 400px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #242424;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.form select {
+  background: #f2f2f2;
+  border: none;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  color: black;
+}
+
+.form button {
+  display: inline-block;
+  border-radius: 36px;
+  background-color: #00ffaab7;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  width: 150px;
+  cursor: pointer;
+  margin: 5px;
+  height: 30px;
+}
+
+.form button:hover,
+.form button:active,
+.form button:focus {
+  background: #00ffaa8a;
+}
+.form .message {
+  margin: 15px 0 0;
+  color: #b3b3b3;
+  font-size: 14px;
+}
+.form .message a {
+  color: #008cff;
+  text-decoration: none;
+}
+
+.form .account-form {
+  max-width: 600px;
+}
+
+.form .register-form {
+  display: none;
+  max-width: 600px;
+}
+
+.images {
+  width: 50px;
+}
+
+.voting-images {
+  width: 35%;
+  display: inline-block;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px;
+}
+
+.button {
+  display: inline-block;
+  border-radius: 36px;
+  background-color: #00ffaab7;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  width: 150px;
+  cursor: pointer;
+  margin: 5px;
+  height: 30px;
+}
+
+.block {
+  height: 100px;
+  width: 100px;
+  background-color: #00ffaab7;
+  padding: 100%;
+}
+
+.disconnect-button {
+  background-color: #f4511e;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  width: 150px;
+  cursor: pointer;
+  margin: 18px;
+  height: 30px;
+  display: inline-block;
+  border-radius: 36px;
+  top: 0px;
+  right: 0px;
+  position: absolute;
+}
+
+.connect-button {
+  background-color: #00ffaab7;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  width: 150px;
+  cursor: pointer;
+  margin: 18px;
+  height: 30px;
+  display: inline-block;
+  border-radius: 36px;
+  top: 0px;
+  right: 0px;
+  position: absolute;
+}
+
+.play-button {
+  background-color: #00ffaab7;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  width: 150px;
+  cursor: pointer;
+  margin: 18px;
+  height: 30px;
+  display: inline-block;
+  border-radius: 36px;
+  top: 50px;
+  right: 0px;
+  position: absolute;
+}
+
+.coin {
+  margin: 0px;
+  width: 25%;
+  cursor: pointer;
+}
+
+.coin:hover,
+.coin:hover {
+  animation: bounce 0.5s 1;
+}
+
+.coin[wobble="1"] {
+  animation: wobble 1s 1;
+}
+
+@keyframes bounce {
+  10% {
+    width: 26%;
+  }
+}
+
+.coinLogo {
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  width: 60px;
+}
+
+.description {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: grey;
+}
+
+.options-container {
+  flex: 1;
+}
+
+.options-header {
+  margin: 15px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}

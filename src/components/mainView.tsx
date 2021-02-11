@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { NavigationBar, Coins, ConnectWallet, ConnectButton, DisconnectButton, OptionChain, CoinInfo } from '.';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
+import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, Play, CoinInfo, OptionChain } from '.';
 import { connect } from '../solanaHelperMethods';
 import { StatsModel } from '../statsModel';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -54,10 +54,12 @@ export class MainView extends React.Component<any, MainViewState> {
 
     render() {
 
-
+        const menu = this.state.authenticated ? <Stats voterKey={this.state.yourKey} model={this.model} balance={this.state.balance} />
+            : null;
         const button = this.state.authenticated ? <DisconnectButton connect={this.connect} /> : <ConnectButton />;
         return (
             <div className="main-view">
+                {menu}
                 <Router>
                     <NavigationBar authenticated={this.state.authenticated} />
                     {button}
@@ -68,6 +70,9 @@ export class MainView extends React.Component<any, MainViewState> {
                             <ConnectWallet onSubmit={this.onSubmit} />
                         </Route>
 
+                        <Route path="/play">
+                            <Play />
+                        </Route>
                         <Route path="/coins">
                             <Coins onSelect={this.onCoinSelect} />
                         </Route>
