@@ -2,25 +2,17 @@ import React from 'react';
 import rp from 'request-promise';
 import * as config from '../configs/config.json';
 import { useTable } from 'react-table';
-import { CoinInfo, CoinsState } from './coins'
 
 import { Link } from 'react-router-dom';
 import { throws } from 'assert';
 import { timeStamp } from 'console';
+import { Coin } from '../models/coin'
 
 interface OptionProps {
-    coin?: CoinInfo;
+    coin?: Coin;
 }
 
-
-
-
 export class Option extends React.Component<OptionProps> {
-
-
-
-
-
 
     makeOption() {
         return (

@@ -3,7 +3,6 @@ import React from 'react';
 import { Link } from 'react-router-dom'
 import { DisconnectButton, ConnectButton } from '.';
 import solanacoin from '../images/solanacoin.png';
-import { classNames } from 'classnames'
 
 export class Play extends React.Component {
 

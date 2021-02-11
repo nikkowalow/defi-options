@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, Play, CoinInfo, OptionChain } from '.';
+import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, Play, OptionChain } from '.';
+import {Coin} from '../models/coin'
 import { connect } from '../solanaHelperMethods';
 import { StatsModel } from '../statsModel';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -15,19 +16,21 @@ interface MainViewState {
     programId: PublicKey;
     balance: number;
     images: string[];
-    coin: CoinInfo;
+    coin: Coin;
     publicKey: PublicKey;
 }
 
 export class MainView extends React.Component<any, MainViewState> {
+    constructor(props) {
+        super (props)
 
-    state = {
-        authenticated: false,
-        images: [mountains, beach],
-
-    } as MainViewState;
-
-
+        this.state = {
+            authenticated: false,
+            images: [mountains, beach],
+    
+        } as MainViewState;
+    }
+ 
 
     async componentDidMount() {
         await connect();
@@ -47,7 +50,7 @@ export class MainView extends React.Component<any, MainViewState> {
         this.setState({ authenticated: status });
     }
 
-    onCoinSelect = (coin: CoinInfo) => {
+    onCoinSelect = (coin: Coin) => {
         console.log(`COIN: ${coin.name}`);
         this.setState({ coin: coin });
     }

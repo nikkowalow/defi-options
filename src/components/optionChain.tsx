@@ -1,70 +1,48 @@
 import React from 'react';
-import rp from 'request-promise';
-import * as config from '../configs/config.json';
-import { useTable } from 'react-table';
-import { CoinInfo, CoinsState } from './coins'
+import {Coin} from '../models/coin'
 import { Option } from '.'
 
-import { Link } from 'react-router-dom';
-import { throws } from 'assert';
-import { timeStamp } from 'console';
-
 interface OptionChainProps {
-    coin?: CoinInfo;
+    coin: Coin;
 }
 
+interface OptionChainState {
+    price: number,
+    volume: number,
+    marketCap: number
+}
 
+export class OptionChain extends React.Component<OptionChainProps, OptionChainState> {
+    constructor(props) {
+        super(props)
 
-
-export class OptionChain extends React.Component<OptionChainProps> {
-
-
-    state = {
-        price: 0,
-        volume: 0,
-        marketCap: 0
+        this.state = {
+            price: 0,
+            volume: 0,
+            marketCap: 0
+        }
+        this.updateQuote = this.updateQuote.bind(this)
     }
-
     componentDidMount() {
+        console.log(this.props)
+        console.log(this.props.coin)
         console.log(`coinName from -options.tsx: ${this.props.coin?.name}`);
-        this.getQuote();
+        this.props.coin.quote(this.updateQuote);
     }
 
-    getQuote = () => {
-        const requestOptions = {
-            method: 'GET',
-            uri: config.CMC.URL.quote,
-            qs: {
-                id: this.props.coin?.id,
-                // convert: config.CMC.currencyConversion
-            },
-            headers: {
-                "X-CMC_PRO_API_KEY": config.CMC.apiKey
-            },
-            json: true,
-            gzip: true,
-        };
-        rp(requestOptions)
-            .then((response) => {
-                if (this.props.coin) {
-                    this.setState({
-                        price: Math.round(response.data[this.props.coin?.id.toString()].quote.USD.price * 100) / 100
-                    });
-                    console.log(`quote: ${this.state.price}`);
-                    console.log("API call response:", response.data[this.props.coin?.id.toString()]);
-                }
-            }).catch((err: any) => {
-                console.log("API call error:", err.message);
+    updateQuote(status: boolean) {
+        if (status) {
+            this.setState({
+                price: this.props.coin.price
             });
+        }
     }
-
 
     makeOptionsChain() {
         return (
             <Option coin={this.props.coin} />
         );
     }
-
 
     render() {
         return (
@@ -81,10 +59,6 @@ export class OptionChain extends React.Component<OptionChainProps> {
                 <button className="button" onClick={this.makeOptionsChain}>
                     view
                 </button>
-                {/* <div className="description">
-                    {this.props.coin?.description}
-                </div> */}
-                {/* <img src={this.state.coin.data} /> */}
             </div >
         );
     }
