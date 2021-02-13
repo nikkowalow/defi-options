@@ -1,7 +1,7 @@
 import React from 'react';
-import {Coin} from '../models/coin'
+import { Coin } from '../models/coin'
 import { Option } from '.'
-
+import { Table } from '.';
 interface OptionChainProps {
     coin: Coin;
 }
@@ -27,13 +27,13 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
         console.log(this.props)
         console.log(this.props.coin)
         console.log(`coinName from -options.tsx: ${this.props.coin?.name}`);
-        this.props.coin.quote(this.updateQuote);
+        this.props.coin?.quote(this.updateQuote);
     }
 
     updateQuote(status: boolean) {
         if (status) {
             this.setState({
-                price: this.props.coin.price
+                price: this.props.coin?.price
             });
         }
     }
@@ -45,6 +45,8 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
     }
 
     render() {
+        const table = (this.state.price) ? <Table underlyingPrice={this.state.price} /> : null;
+
         return (
             <div className="options-container">
 
@@ -55,10 +57,7 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
                 </h2>
                 {this.makeOptionsChain()}
 
-
-                <button className="button" onClick={this.makeOptionsChain}>
-                    view
-                </button>
+                {table}
             </div >
         );
     }

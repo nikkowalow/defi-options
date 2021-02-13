@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, Play, OptionChain } from '.';
+import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, OptionChain } from '.';
 import { Coin } from '../models/coin'
 import { connect } from '../solanaHelperMethods';
 import { StatsModel } from '../statsModel';
@@ -8,6 +8,8 @@ import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { throws } from 'assert';
 import mountains from "../images/mountains.jpg";
 import beach from "../images/beach.jpg";
+import solanalogo from '../images/solanalogo.png';
+
 
 interface MainViewState {
     model: StatsModel;
@@ -80,6 +82,10 @@ export class MainView extends React.Component<any, MainViewState> {
                         </Route>
                         {/* <PrivateRoute isConnected={this.state.authenticated} path="/voting" component={<Voting model={this.model} voterKey={this.state.publicKey} />} /> */}
                     </Switch>
+                    <div className="watermark">
+                        <span className="watermark-phrase">powered by</span>
+                        <img className="watermark-logo" src={solanalogo} />
+                    </div>
                 </Router>
             </div >
         );

@@ -21,9 +21,6 @@ export class NavigationBar extends React.Component<NavigationBarProps> {
         return (
             <div>
 
-                <Link to="/">
-                    <img src={solanalogo} className="navigation-bar-logo" />
-                </Link>
 
                 <Link to="/coins">
                     <button className="play-button">
