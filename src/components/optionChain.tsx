@@ -45,18 +45,16 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
     }
 
     render() {
-        const table = (this.state.price) ? <Table underlyingPrice={this.state.price} /> : null;
+        const table = (this.state.price) ? <Table coin={this.props.coin} /> : null;
 
         return (
             <div className="options-container">
 
                 <h2 className="options-header">
                     {this.props.coin?.name} ({this.props.coin?.symbol})
-                    <img src={this.props.coin?.logo} className="coinLogo" />
+                    <img src={this.props.coin?.logo} className="coin-icon" />
                     ${this.state.price}
                 </h2>
-                {this.makeOptionsChain()}
-
                 {table}
             </div >
         );

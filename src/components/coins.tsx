@@ -1,6 +1,6 @@
 import React from 'react';
 import * as config from '../configs/config.json';
-import {Coin} from '../models/coin'
+import { Coin } from '../models/coin'
 
 import { Link } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ interface CoinsProps {
     onSelect: (coin: Coin) => void;
 }
 
- interface CoinsState {
+interface CoinsState {
     coins: { [id: number]: Coin };
 }
 
@@ -42,7 +42,7 @@ export class Coins extends React.Component<CoinsProps, CoinsState> {
                     console.log(response)
                     coins.push(Coin.parse(response[key]));
                 });
-                this.setState({coins: coins})
+                this.setState({ coins: coins })
             }).catch((err: any) => {
                 console.log("API Call Error:", err.message);
             });
@@ -51,14 +51,14 @@ export class Coins extends React.Component<CoinsProps, CoinsState> {
     icons() {
         return Object.values(this.state.coins).map(coin =>
             <Link to="/options">
-                <img src={coin.logo} onClick={() => this.props.onSelect(coin)} className="coinLogo" />
+                <img src={coin.logo} onClick={() => this.props.onSelect(coin)} className="coin-icon" />
             </Link>
         );
     }
 
     render() {
         return (
-            <div>
+            <div className="coin-icons">
                 {this.icons()}
             </div>
         );

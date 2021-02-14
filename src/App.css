@@ -242,13 +242,26 @@
   }
 }
 
-.coinLogo {
+.coin-icon {
   padding: 10px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   border-radius: 50%;
-  width: 60px;
+  width: 80px;
+  transition: all 0.1s ease-in-out;
+}
+
+.coin-icon:hover {
+  transform: scale(1.4);
+}
+
+.coin-icons {
+  max-width: 80%;
+  text-align: center;
+  margin: auto;
+  width: 30%;
+  padding: 10px;
 }
 
 .description {

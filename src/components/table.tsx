@@ -1,16 +1,18 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { Component } from 'react'
 import * as style from '../configs/style.json';
-
+import { Coin } from '../models/coin';
+var rp = require('request-promise');
 
 var greeks = require('greeks');
 
 interface TableProps {
-    underlyingPrice: number;
+    coin?: Coin;
 }
 
 interface TableState {
-    options: OptionType[]; // todo: use type
+    calls: OptionType[];
+    puts: OptionType[];
 }
 
 interface OptionType {
@@ -19,12 +21,12 @@ interface OptionType {
 
 export class Table extends React.Component<TableProps, TableState> {
 
-    minStrike: number = 0;
-    maxStrike: number = 0;
-    strikeInterval: number = 0;
+    data: {} = {};
+    instrument: {} = {};
 
     state = {
-        options: []
+        calls: [],
+        puts: []
     }
 
 
@@ -32,30 +34,80 @@ export class Table extends React.Component<TableProps, TableState> {
         this.fillTable();
     }
 
-    fillTable() {
-        this.setStrikeBounds();
-        this.setInterval();
-        let options: OptionType[] = [];
-        for (let i = this.minStrike; i < this.maxStrike; i += this.strikeInterval) {
-            let strike = Math.round(i * 100) / 100;
-            options.push({
-                strike: strike, lastPrice: 100, bid: 0.77, ask: 0.79, premium: 55, delta: "0.63",
-                gamma: "0.92", theta: "0.22", rho: "0.47", vega: "0.99", change: "231", percentChange: "14%"
-            });
+    async fillTable() {
+        await this.getOptionChain();
+        if (!this.data)
+            return;
+        let calls: OptionType[] = [];
+        let puts: OptionType[] = [];
+        const length = Object.getOwnPropertyNames(this.data).length;
+        for (let i = 0; i < length / 40; i++) {
+            const instrumentID = this.data[i].instrument_name;
+            await this.getOptionInfo(instrumentID);
+            let info = this.data[i];
+            if (instrumentID.split('-')[3] == 'C') {
+                calls.push({
+                    instrumentID: info.instrument_name,
+                    strike: instrumentID.split('-')[2],
+                    bid: info.bid_price,
+                    ask: info.ask_price,
+                    delta: this.instrument['greeks'].delta,
+                    gamma: this.instrument['greeks'].gamma,
+                    theta: this.instrument['greeks'].theta,
+                    rho: this.instrument['greeks'].rho,
+                    vega: this.instrument['greeks'].vega,
+                    percentChange: "14%",
+                    expirationDate: instrumentID.split('-')[1]
+                });
+            } else {
+                puts.push({
+                    instrumentID: info.instrument_name,
+                    strike: instrumentID.split('-')[2],
+                    bid: info.bid_price,
+                    ask: info.ask_price,
+                    delta: this.instrument['greeks'].delta,
+                    gamma: this.instrument['greeks'].gamma,
+                    theta: this.instrument['greeks'].theta,
+                    rho: this.instrument['greeks'].rho,
+                    vega: this.instrument['greeks'].vega,
+                    percentChange: "14%",
+                    expirationDate: instrumentID.split('-')[1]
+                });
+            }
         }
-        this.setState({ options });
+        this.setState({ calls });
+        this.setState({ puts });
     }
 
-    setInterval() {
-        this.strikeInterval = (this.props.underlyingPrice / 10);
+    getOptionInfo = async (instrumentName: string) => {
+        const requestOptions = {
+            method: 'GET',
+            uri: "https://test.deribit.com/api/v2/public/ticker?instrument_name=" + instrumentName,
+            "jsonrpc": "2.0",
+            json: true
+        };
+        await rp(requestOptions)
+            .then((response) => {
+                this.instrument = response['result'];
+            }).catch((err) => {
+                console.log("API call error getOptionInfo():", err.message);
+            });
     }
 
-    setStrikeBounds() {
-        this.minStrike = this.props.underlyingPrice / 2;
-        this.maxStrike = this.props.underlyingPrice + this.minStrike;
+    async getOptionChain() {
+        const requestOptions = {
+            method: 'GET',
+            uri: "https://test.deribit.com/api/v2/public/get_book_summary_by_currency?currency=" + this.props.coin?.symbol + "&kind=option",
+            "jsonrpc": "2.0",
+            json: true
+        };
+        await rp(requestOptions)
+            .then((response) => {
+                this.data = response['result'];
+            }).catch((err) => {
+                console.log("API call error getOptionChain():", err.message);
+            });
     }
-
-
 
 
     renderOption = (option: any, index: any) => {
@@ -63,18 +115,17 @@ export class Table extends React.Component<TableProps, TableState> {
         return (
 
             <tr key={index} >
+                <td>{option.instrumentID}</td>
                 <td>{option.strike}</td>
                 <td>{option.bid}</td>
                 <td>{option.ask}</td>
-                <td>{option.premium}</td>
-                <td>{option.lastPrice}</td>
                 <td>{option.delta}</td>
                 <td>{option.gamma}</td>
                 <td>{option.theta}</td>
                 <td>{option.rho}</td>
                 <td>{option.vega}</td>
-                <td>{option.change}</td>
                 <td>{option.percentChange}</td>
+                <td>{option.expirationDate}</td>
                 <td>
                     <div className="buy-sell-buttons">
                         <button className="buy-button">BUY</button>
@@ -88,7 +139,6 @@ export class Table extends React.Component<TableProps, TableState> {
     }
 
     render() {
-        console.log(`price: ${this.props.underlyingPrice}`);
         return (
             <div className="table">
                 <thead>
@@ -103,13 +153,13 @@ export class Table extends React.Component<TableProps, TableState> {
                         <th>Theta {style.greeks.theta}</th>
                         <th>Rho {style.greeks.rho}</th>
                         <th>Vega {style.greeks.vega}</th>
-                        <th>Change</th>
                         <th>% Change</th>
-                        <th>Execute</th>
+                        <th>Exp. Date</th>
                     </tr>
                 </thead>
                 <tbody className="table-body">
-                    {this.state.options.map(this.renderOption)}
+                    {this.state.calls.map(this.renderOption)}
+                    {this.state.puts.map(this.renderOption)}
                 </tbody>
             </div>
         );
