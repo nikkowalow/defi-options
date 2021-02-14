@@ -1,6 +1,5 @@
 import React from 'react';
 import { Coin } from '../models/coin'
-import { Option } from '.'
 import { Table } from '.';
 interface OptionChainProps {
     coin: Coin;
@@ -36,12 +35,6 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
                 price: this.props.coin?.price
             });
         }
-    }
-
-    makeOptionsChain() {
-        return (
-            <Option coin={this.props.coin} />
-        );
     }
 
     render() {
