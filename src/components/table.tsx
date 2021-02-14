@@ -21,9 +21,6 @@ interface OptionType {
 
 export class Table extends React.Component<TableProps, TableState> {
 
-    data: {} = {};
-    instrument: {} = {};
-
     state = {
         calls: [],
         puts: []
@@ -35,27 +32,27 @@ export class Table extends React.Component<TableProps, TableState> {
     }
 
     async fillTable() {
-        await this.getOptionChain();
-        if (!this.data)
+        await this.props.coin?.getOptionChain();
+        if (!this.props.coin?.data)
             return;
         let calls: OptionType[] = [];
         let puts: OptionType[] = [];
-        const length = Object.getOwnPropertyNames(this.data).length;
+        const length = Object.getOwnPropertyNames(this.props.coin?.data).length;
         for (let i = 0; i < length / 40; i++) {
-            const instrumentID = this.data[i].instrument_name;
-            await this.getOptionInfo(instrumentID);
-            let info = this.data[i];
+            const instrumentID = this.props.coin?.data[i].instrument_name;
+            await this.props.coin?.getOptionInfo(instrumentID);
+            let info = this.props.coin?.data[i];
             if (instrumentID.split('-')[3] == 'C') {
                 calls.push({
                     instrumentID: info.instrument_name,
                     strike: instrumentID.split('-')[2],
                     bid: info.bid_price,
                     ask: info.ask_price,
-                    delta: this.instrument['greeks'].delta,
-                    gamma: this.instrument['greeks'].gamma,
-                    theta: this.instrument['greeks'].theta,
-                    rho: this.instrument['greeks'].rho,
-                    vega: this.instrument['greeks'].vega,
+                    delta: this.props.coin?.instrument['greeks'].delta,
+                    gamma: this.props.coin?.instrument['greeks'].gamma,
+                    theta: this.props.coin?.instrument['greeks'].theta,
+                    rho: this.props.coin?.instrument['greeks'].rho,
+                    vega: this.props.coin?.instrument['greeks'].vega,
                     percentChange: "14%",
                     expirationDate: instrumentID.split('-')[1]
                 });
@@ -65,11 +62,11 @@ export class Table extends React.Component<TableProps, TableState> {
                     strike: instrumentID.split('-')[2],
                     bid: info.bid_price,
                     ask: info.ask_price,
-                    delta: this.instrument['greeks'].delta,
-                    gamma: this.instrument['greeks'].gamma,
-                    theta: this.instrument['greeks'].theta,
-                    rho: this.instrument['greeks'].rho,
-                    vega: this.instrument['greeks'].vega,
+                    delta: this.props.coin?.instrument['greeks'].delta,
+                    gamma: this.props.coin?.instrument['greeks'].gamma,
+                    theta: this.props.coin?.instrument['greeks'].theta,
+                    rho: this.props.coin?.instrument['greeks'].rho,
+                    vega: this.props.coin?.instrument['greeks'].vega,
                     percentChange: "14%",
                     expirationDate: instrumentID.split('-')[1]
                 });
@@ -78,37 +75,6 @@ export class Table extends React.Component<TableProps, TableState> {
         this.setState({ calls });
         this.setState({ puts });
     }
-
-    getOptionInfo = async (instrumentName: string) => {
-        const requestOptions = {
-            method: 'GET',
-            uri: "https://test.deribit.com/api/v2/public/ticker?instrument_name=" + instrumentName,
-            "jsonrpc": "2.0",
-            json: true
-        };
-        await rp(requestOptions)
-            .then((response) => {
-                this.instrument = response['result'];
-            }).catch((err) => {
-                console.log("API call error getOptionInfo():", err.message);
-            });
-    }
-
-    async getOptionChain() {
-        const requestOptions = {
-            method: 'GET',
-            uri: "https://test.deribit.com/api/v2/public/get_book_summary_by_currency?currency=" + this.props.coin?.symbol + "&kind=option",
-            "jsonrpc": "2.0",
-            json: true
-        };
-        await rp(requestOptions)
-            .then((response) => {
-                this.data = response['result'];
-            }).catch((err) => {
-                console.log("API call error getOptionChain():", err.message);
-            });
-    }
-
 
     renderOption = (option: any, index: any) => {
         console.log('current option' + option);
