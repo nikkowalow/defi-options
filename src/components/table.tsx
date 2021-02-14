@@ -124,7 +124,6 @@ export class Table extends React.Component<TableProps, TableState> {
                 <td>{option.theta}</td>
                 <td>{option.rho}</td>
                 <td>{option.vega}</td>
-                <td>{option.percentChange}</td>
                 <td>{option.expirationDate}</td>
                 <td>
                     <div className="buy-sell-buttons">
@@ -143,18 +142,17 @@ export class Table extends React.Component<TableProps, TableState> {
             <div className="table">
                 <thead>
                     <tr className="table-body">
+                        <th>Instrument ID</th>
                         <th>Strike</th>
                         <th>Bid</th>
                         <th>Ask</th>
-                        <th>Premium</th>
-                        <th>Last Price</th>
                         <th>Delta {style.greeks.delta}</th>
                         <th>Gamma {style.greeks.gamma}</th>
                         <th>Theta {style.greeks.theta}</th>
                         <th>Rho {style.greeks.rho}</th>
                         <th>Vega {style.greeks.vega}</th>
-                        <th>% Change</th>
                         <th>Exp. Date</th>
+                        <th>Buy/Sell</th>
                     </tr>
                 </thead>
                 <tbody className="table-body">
