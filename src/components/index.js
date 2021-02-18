@@ -15,6 +15,6 @@ __exportStar(require("./navigationBar"), exports);
 __exportStar(require("./stats"), exports);
 __exportStar(require("./table"), exports);
 __exportStar(require("./disconnectButton"), exports);
-__exportStar(require("./connectButton"), exports);
 __exportStar(require("./coins"), exports);
 __exportStar(require("./optionChain"), exports);
+__exportStar(require("./connectButton"), exports);

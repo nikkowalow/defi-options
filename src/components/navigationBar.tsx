@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
-import { DisconnectButton, ConnectButton } from '.';
+import { DisconnectButton } from '.';
 import solanalogo from '../images/solanalogo.png';
 
 interface NavigationBarProps {

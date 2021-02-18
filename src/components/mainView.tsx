@@ -9,7 +9,8 @@ import { throws } from 'assert';
 import mountains from "../images/mountains.jpg";
 import beach from "../images/beach.jpg";
 import solanalogo from '../images/solanalogo.png';
-
+import { ConnectionProvider } from '../models/connection';
+import { WalletProvider } from '../models/wallet';
 
 interface MainViewState {
     model: StatsModel;
@@ -58,35 +59,36 @@ export class MainView extends React.Component<any, MainViewState> {
     }
 
     render() {
-
         const menu = this.state.authenticated ? <Stats voterKey={this.state.yourKey} model={this.model} balance={this.state.balance} />
             : null;
-        const button = this.state.authenticated ? <DisconnectButton connect={this.connect} /> : <ConnectButton />;
         return (
             <div className="main-view">
                 {menu}
                 <Router>
                     <NavigationBar authenticated={this.state.authenticated} />
-                    {button}
-                    <Switch>
 
+                    <ConnectionProvider>
+                        <WalletProvider>
+                            <ConnectButton />
+                            <Switch>
+                                <Route path="/connect">
+                                    <ConnectWallet onSubmit={this.onSubmit} />
+                                </Route>
+                                <Route path="/coins">
+                                    <Coins onSelect={this.onCoinSelect} />
+                                </Route>
+                                <Route path="/options">
+                                    <OptionChain coin={this.state.coin} />
+                                </Route>
+                            </Switch>
+                        </WalletProvider >
+                    </ConnectionProvider >
 
-                        <Route path="/connect">
-                            <ConnectWallet onSubmit={this.onSubmit} />
-                        </Route>
-                        <Route path="/coins">
-                            <Coins onSelect={this.onCoinSelect} />
-                        </Route>
-                        <Route path="/options">
-                            <OptionChain coin={this.state.coin} />
-                        </Route>
-                        {/* <PrivateRoute isConnected={this.state.authenticated} path="/voting" component={<Voting model={this.model} voterKey={this.state.publicKey} />} /> */}
-                    </Switch>
                     <div className="watermark">
                         <span className="watermark-phrase">powered by</span>
                         <img className="watermark-logo" src={solanalogo} />
                     </div>
-                </Router>
+                </Router >
             </div >
         );
     }

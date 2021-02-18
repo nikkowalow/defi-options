@@ -3,6 +3,8 @@ import './App.css';
 
 import React from 'react';
 import { MainView } from './components/mainView';
+import "./App.less";
+import { Routes } from './routes';
 
 function App() {
   return (
