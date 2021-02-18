@@ -6,11 +6,7 @@ interface StatsModelProps {
 }
 
 export class StatsModel {
-
     public async getBalance(key: PublicKey) {
         return getBalance(key);
     }
-
-
-
 }

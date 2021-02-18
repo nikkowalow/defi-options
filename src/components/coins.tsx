@@ -51,7 +51,7 @@ export class Coins extends React.Component<CoinsProps, CoinsState> {
     icons() {
         return Object.values(this.state.coins).map(coin =>
             <Link to="/options">
-                <img src={coin.logo} onClick={() => this.props.onSelect(coin)} className="coinLogo" />
+                <img src={coin.logo} alt={coin.name} onClick={() => this.props.onSelect(coin)} className="coinLogo" />
             </Link>
         );
     }

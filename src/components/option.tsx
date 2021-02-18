@@ -4,7 +4,7 @@ import * as config from '../configs/config.json';
 import { Coin } from '../models/coin'
 
 interface OptionProps {
-    coin?: Coin;
+    coin: Coin;
 }
 
 export class Option extends React.Component<OptionProps> {

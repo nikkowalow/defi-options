@@ -1,11 +1,10 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, Play, OptionChain } from '.';
 import {Coin} from '../models/coin'
 import { connect } from '../solanaHelperMethods';
 import { StatsModel } from '../statsModel';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { throws } from 'assert';
 import mountains from "../images/mountains.jpg";
 import beach from "../images/beach.jpg";
 
@@ -36,7 +35,7 @@ export class MainView extends React.Component<any, MainViewState> {
         await connect();
     }
 
-    model = new StatsModel;
+    model = new StatsModel();
     onSubmit = async (key: string, status: boolean) => {
         const balance = await this.model.getBalance(new PublicKey(key));
         this.setState({

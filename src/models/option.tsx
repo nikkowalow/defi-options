@@ -1,3 +1,17 @@
+export class OptionChainModel {
+    expirationDate: Date;
+    options: OptionModel[] = [] as OptionModel[];
+    
+    constructor(expirationDate: Date, options?: OptionModel[]) {
+        this.expirationDate = expirationDate;
+        this.options = options?options:this.options;
+    }
+
+    generateOptions(interval: number) {
+
+    }
+}
+
 export class OptionModel {
     public strike: number;
     public call: CallModel;
@@ -78,8 +92,3 @@ export class PutModel extends OptionTypeModel {
         return -1;
     }
 }
-
-
-
-    
-

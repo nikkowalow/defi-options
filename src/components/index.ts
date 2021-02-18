@@ -1,5 +1,3 @@
-import { fileURLToPath } from 'url'
-
 export * from './connectWallet'
 export * from './navigationBar'
 

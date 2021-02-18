@@ -53,6 +53,7 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
                     <img src={this.props.coin?.logo} className="coinLogo" />
                     ${this.state.price}
                 </h2>
+                
                 {this.makeOptionsChain()}
 
 
