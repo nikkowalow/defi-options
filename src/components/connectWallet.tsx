@@ -1,7 +1,5 @@
-import { timeStamp } from 'console';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getBalance } from '../solanaHelperMethods';
 
 
 interface ConnectWalletProps {

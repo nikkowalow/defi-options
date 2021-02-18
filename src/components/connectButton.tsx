@@ -1,4 +1,4 @@
-import { Button, Dropdown, Menu } from "antd";
+import { Button } from "antd";
 import { ButtonProps } from "antd/lib/button";
 import React from "react";
 import { useWallet } from "../models/wallet";
@@ -11,7 +11,7 @@ export interface ConnectButtonProps
 
 export const ConnectButton = (props: ConnectButtonProps) => {
     const { connected, connect, provider, disconnect } = useWallet();
-    const { onClick, allowWalletChange } = props;
+    const { allowWalletChange } = props;
 
 
 

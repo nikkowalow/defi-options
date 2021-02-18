@@ -1,5 +1,4 @@
 import React from 'react';
-import { StatsModel } from '../statsModel';
 import { Link } from 'react-router-dom'
 
 interface DisconnectButtonProps {
