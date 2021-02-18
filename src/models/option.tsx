@@ -1,3 +1,5 @@
+import greeks from 'greeks';
+
 export class OptionChainModel {
     expirationDate: Date;
     options: OptionModel[] = [] as OptionModel[];
@@ -39,7 +41,9 @@ abstract class OptionTypeModel {
     abstract calculateFairPrice(): number;
 
     //Implemented per call/pull
-    abstract calculateDelta(): number;
+    abstract calculateDelta(
+
+    ): number;
 
     calculateGamma(): number {
         return -1;
@@ -57,12 +61,12 @@ abstract class OptionTypeModel {
 
 export class CallModel extends OptionTypeModel {
     //Black scholes for calls
-    calculateFairPrice(): number {
-        return -1;
+    calculateFairPrice() {
+        return 0;
     }
 
     calculateDelta(): number {
-        return -1;
+        return greeks.getDelta();
     }
 
     calculateTheta(): number {

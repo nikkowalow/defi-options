@@ -242,13 +242,26 @@
   }
 }
 
-.coinLogo {
+.coin-icon {
   padding: 10px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   border-radius: 50%;
-  width: 60px;
+  width: 80px;
+  transition: all 0.1s ease-in-out;
+}
+
+.coin-icon:hover {
+  transform: scale(1.4);
+}
+
+.coin-icons {
+  max-width: 80%;
+  text-align: center;
+  margin: auto;
+  width: 30%;
+  padding: 10px;
 }
 
 .description {
@@ -257,19 +270,69 @@
   color: grey;
 }
 
-.options-container {
-  flex: 1;
-  font-size: 30px;
-}
-
-.options-chain {
-  font-size: 15px;
-}
-
 .options-header {
   margin: 15px;
   padding: 15px;
   display: flex;
   align-items: center;
   text-align: center;
+}
+
+.table-headers {
+  font-size: 18px;
+  padding: 15px;
+  margin: 15px;
+}
+
+.table-body {
+  font-size: 18px;
+  color: white;
+}
+
+.watermark {
+  position: flex;
+  width: 100%;
+  bottom: 0;
+}
+
+.watermark-logo {
+  width: 100px;
+  vertical-align: middle;
+}
+
+.watermark-phrase {
+  vertical-align: 8px;
+  font-size: 20px;
+}
+
+.buy-button {
+  background-color: #00ffaab7;
+  display: inline-block;
+  border-radius: 36px;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 15px;
+  width: 60px;
+  cursor: pointer;
+  margin: 5px;
+  height: 25px;
+}
+
+.sell-button {
+  background-color: #f4511e;
+  display: inline-block;
+  border-radius: 36px;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 15px;
+  width: 60px;
+  cursor: pointer;
+  margin: 5px;
+  height: 25px;
+}
+
+.buy-sell-buttons {
+  display: inline-block;
 }
