@@ -18,3 +18,4 @@ __exportStar(require("./disconnectButton"), exports);
 __exportStar(require("./coins"), exports);
 __exportStar(require("./optionChain"), exports);
 __exportStar(require("./connectButton"), exports);
+__exportStar(require("./faucet"), exports);

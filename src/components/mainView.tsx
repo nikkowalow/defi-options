@@ -1,12 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import { NavigationBar, Coins, Stats, ConnectWallet, ConnectButton, DisconnectButton, OptionChain } from '.';
+import { NavigationBar, Coins, Faucet, Stats, ConnectWallet, ConnectButton, DisconnectButton, OptionChain } from '.';
 import { Coin } from '../models/coin'
 import { connect } from '../solanaHelperMethods';
 import { StatsModel } from '../statsModel';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import mountains from "../images/mountains.jpg";
-import beach from "../images/beach.jpg";
 import solanalogo from '../images/solanalogo.png';
 import { ConnectionProvider } from '../models/connection';
 import { WalletProvider } from '../models/wallet';
@@ -28,8 +26,6 @@ export class MainView extends React.Component<any, MainViewState> {
 
         this.state = {
             authenticated: false,
-            images: [mountains, beach],
-
         } as MainViewState;
     }
 
@@ -58,14 +54,10 @@ export class MainView extends React.Component<any, MainViewState> {
     }
 
     render() {
-        const menu = this.state.authenticated ? <Stats voterKey={this.state.yourKey} model={this.model} balance={this.state.balance} />
-            : null;
         return (
             <div className="main-view">
-                {menu}
                 <Router>
                     <NavigationBar authenticated={this.state.authenticated} />
-
                     <ConnectionProvider>
                         <WalletProvider>
                             <ConnectButton />
@@ -78,6 +70,9 @@ export class MainView extends React.Component<any, MainViewState> {
                                 </Route>
                                 <Route path="/options">
                                     <OptionChain coin={this.state.coin} />
+                                </Route>
+                                <Route>
+                                    <Faucet />
                                 </Route>
                             </Switch>
                         </WalletProvider >

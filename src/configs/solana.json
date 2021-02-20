@@ -1,0 +1,7 @@
+{
+    "endpoints": {
+        "DEVNET_CLUSTER": "https://devnet.solana.com",
+        "TESTNET_CLUSTER": "https://testnet.solana.com",
+        "MAINNET_CLUSTER": "https://mainnet.solana.com"
+    }
+}
