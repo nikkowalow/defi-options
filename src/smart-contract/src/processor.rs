@@ -6,26 +6,33 @@ use solana_program::{
     pubkey::Pubkey,
     program_pack::{Pack, IsInitialized},
     sysvar::{rent::Rent, Sysvar},
-    program::invoke
+    program::invoke,
+    system_instruction
 };
 
-use crate::{instruction::ThirdPartyInstruction, state::ThirdParty};
+use spl_token::{
+    self,
+    instruction::*,
+    state::{Mint, Account},
+};
+
+use crate::{instruction::EscrowInstruction, state::Escrow};
 
 
 pub struct Processor;
 impl Processor {
     pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8]) -> ProgramResult {
-        let instruction = ThirdPartyInstruction::unpack(instruction_data)?;
+        let instruction = EscrowInstruction::unpack(instruction_data)?;
 
         match instruction {
-            ThirdPartyInstruction::InitThirdParty { amount } => {
-                msg!("Instruction: InitThirdParty");
-                Self::process_init_ThirdParty(accounts, amount, program_id)
+            EscrowInstruction::InitEscrow { amount } => {
+                msg!("Instruction: InitEscrow");
+                Self::process_init_escrow(accounts, amount, program_id)
             }
         }
     }
 
-    fn process_init_ThirdParty(
+    fn process_init_escrow(
         accounts: &[AccountInfo],
         amount: u64,
         program_id: &Pubkey,
@@ -44,26 +51,26 @@ impl Processor {
             return Err(ProgramError::IncorrectProgramId);
         }
         
-        let ThirdParty_account = next_account_info(account_info_iter)?;
+        let escrow_account = next_account_info(account_info_iter)?;
         let rent = &Rent::from_account_info(next_account_info(account_info_iter)?)?;
 
-        // if !rent.is_exempt(ThirdParty_account.lamports(), ThirdParty_account.data_len()) {
-        //     return Err(ThirdPartyError::NotRentExempt.into());
+        // if !rent.is_exempt(Escrow_account.lamports(), Escrow_account.data_len()) {
+        //     return Err(EscrowError::NotRentExempt.into());
         // }
 
-        let mut ThirdParty_info = ThirdParty::unpack_unchecked(&ThirdParty_account.data.borrow())?;
-        if ThirdParty_info.is_initialized() {
+        let mut escrow_info = Escrow::unpack_unchecked(&escrow_account.data.borrow())?;
+        if escrow_info.is_initialized() {
             return Err(ProgramError::AccountAlreadyInitialized);
         }
 
-        ThirdParty_info.is_initialized = true;
-        ThirdParty_info.initializer_pubkey = *initializer.key;
-        ThirdParty_info.temp_token_account_pubkey = *temp_token_account.key;
-        ThirdParty_info.initializer_token_to_receive_account_pubkey = *token_to_receive_account.key;
-        ThirdParty_info.expected_amount = amount;
+        escrow_info.is_initialized = true;
+        escrow_info.initializer_pubkey = *initializer.key;
+        escrow_info.temp_token_account_pubkey = *temp_token_account.key;
+        escrow_info.initializer_token_to_receive_account_pubkey = *token_to_receive_account.key;
+        escrow_info.expected_amount = amount;
         
-        ThirdParty::pack(ThirdParty_info, &mut ThirdParty_account.data.borrow_mut())?;
-        let (pda, _bump_seed) = Pubkey::find_program_address(&[b"ThirdParty"], program_id);
+        Escrow::pack(escrow_info, &mut escrow_account.data.borrow_mut())?;
+        let (pda, _bump_seed) = Pubkey::find_program_address(&[b"Escrow"], program_id);
 
         let token_program = next_account_info(account_info_iter)?;
         let owner_change_ix = spl_token::instruction::set_authority(
@@ -87,4 +94,35 @@ impl Processor {
 
         Ok(())
     }
+
+    pub fn process_create_token(
+        account_key: Pubkey,
+        decimals: u8,
+        token: Pubkey,
+        enable_freeze: bool,
+    ) -> ProgramResult {
+        println!("Creating token {:?}...", token);
+
+        let min_rent_exemption = 100000; //hardcoded for now
+    
+        let instructions = vec![
+            system_instruction::create_account(
+                &account_key,
+                &token,
+                min_rent_exemption,
+                Mint::LEN as u64,
+                &spl_token::id(),
+            ),
+            initialize_mint(
+                &spl_token::id(),
+                &token,
+                &account_key,
+                Option::None,
+                decimals,
+            )?,
+        ];
+        Ok(())
+    }
+
+
 }

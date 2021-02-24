@@ -1,38 +1,46 @@
-// inside instruction.rs
-
+use byteorder::{ByteOrder, LittleEndian};
 
 use std::convert::TryInto;
 use solana_program::program_error::ProgramError;
 
-use crate::error::ThirdPartyError::InvalidInstruction;
+use crate::error::EscrowError::InvalidInstruction;
+
+use solana_program::{
+    entrypoint::ProgramResult,
+    msg,
+    pubkey::Pubkey,
+    instruction::{AccountMeta, Instruction},
+    sysvar,
+    program_pack::Pack,
+};
+use spl_token::{
+    self,
+    state::{Mint},
+};
 
 
-pub enum ThirdPartyInstruction {
-
-    /// Starts the trade by creating and populating an ThirdParty account and transferring ownership of the given temp token account to the PDA
-    ///
-    ///
-    /// Accounts expected:
-    ///
-    /// 0. `[signer]` The account of the person initializing the ThirdParty
-    /// 1. `[writable]` Temporary token account that should be created prior to this instruction and owned by the initializer
-    /// 2. `[]` The initializer's token account for the token they will receive should the trade go through
-    /// 3. `[writable]` The ThirdParty account, it will hold all necessary info about the trade.
-    /// 4. `[]` The rent sysvar
-    /// 5. `[]` The token program
-    InitThirdParty {
-        /// The amount party A expects to receive of token Y
+pub enum EscrowInstruction {
+    InitEscrow {
         amount: u64
     }
 }
 
-impl ThirdPartyInstruction {
-    /// Unpacks a byte buffer into a [ThirdPartyInstruction](enum.ThirdPartyInstruction.html).
+pub enum TokenInstruction {
+    
+    InitializeMint {
+        decimals: u8,
+        mint_authority: Pubkey,
+    }
+
+}
+
+impl EscrowInstruction {
+    /// Unpacks a byte buffer into a [EscrowInstruction](enum.EscrowInstruction.html).
     pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
         let (tag, rest) = input.split_first().ok_or(InvalidInstruction)?;
 
         Ok(match tag {
-            0 => Self::InitThirdParty {
+            0 => Self::InitEscrow {
                 amount: Self::unpack_amount(rest)?,
             },
             _ => return Err(InvalidInstruction.into()),
@@ -48,3 +56,28 @@ impl ThirdPartyInstruction {
         Ok(amount)
     }
 }
+
+impl TokenInstruction {
+
+    pub fn initialize_mint(
+        token_program_id: &Pubkey,
+        mint_pubkey: &Pubkey,
+        mint_authority_pubkey: &Pubkey,
+        decimals: u8,
+    ) -> ProgramResult{
+        let mut data = TokenInstruction::InitializeMint {
+            decimals,
+            mint_authority: *mint_authority_pubkey,
+        };
+    
+        let accounts = vec![
+            AccountMeta::new(*mint_pubkey, false),
+            AccountMeta::new_readonly(sysvar::rent::id(), false),
+        ];
+    
+
+        Ok(())
+    }
+
+}
+

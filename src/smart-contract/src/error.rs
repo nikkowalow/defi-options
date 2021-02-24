@@ -1,18 +1,15 @@
-// inside error.rs
 use thiserror::Error;
 
 use solana_program::program_error::ProgramError;
 
-
 #[derive(Error, Debug, Copy, Clone)]
-pub enum ThirdPartyError {
-    /// Invalid instruction
+pub enum EscrowError {
     #[error("Invalid Instruction")]
     InvalidInstruction,
 }
 
-impl From<ThirdPartyError> for ProgramError {
-    fn from(e: ThirdPartyError) -> Self {
+impl From<EscrowError> for ProgramError {
+    fn from(e: EscrowError) -> Self {
         ProgramError::Custom(e as u32)
     }
 }

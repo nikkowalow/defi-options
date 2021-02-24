@@ -6,7 +6,7 @@ use solana_program::{
 
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
 
-pub struct ThirdParty {
+pub struct Escrow {
     pub is_initialized: bool,
     pub initializer_pubkey: Pubkey,
     pub temp_token_account_pubkey: Pubkey,
@@ -14,18 +14,18 @@ pub struct ThirdParty {
     pub expected_amount: u64,
 }
 
-impl Sealed for ThirdParty {}
+impl Sealed for Escrow {}
 
-impl IsInitialized for ThirdParty {
+impl IsInitialized for Escrow {
     fn is_initialized(&self) -> bool {
         self.is_initialized
     }
 }
 
-impl Pack for ThirdParty {
+impl Pack for Escrow {
     const LEN: usize = 105;
     fn unpack_from_slice(src: &[u8]) -> Result<Self, ProgramError> {
-        let src = array_ref![src, 0, ThirdParty::LEN];
+        let src = array_ref![src, 0, Escrow::LEN];
         let (
             is_initialized,
             initializer_pubkey,
@@ -39,7 +39,7 @@ impl Pack for ThirdParty {
             _ => return Err(ProgramError::InvalidAccountData),
         };
 
-        Ok(ThirdParty {
+        Ok(Escrow {
             is_initialized,
             initializer_pubkey: Pubkey::new_from_array(*initializer_pubkey),
             temp_token_account_pubkey: Pubkey::new_from_array(*temp_token_account_pubkey),
@@ -49,7 +49,7 @@ impl Pack for ThirdParty {
     }
 
     fn pack_into_slice(&self, dst: &mut [u8]) {
-        let dst = array_mut_ref![dst, 0, ThirdParty::LEN];
+        let dst = array_mut_ref![dst, 0, Escrow::LEN];
         let (
             is_initialized_dst,
             initializer_pubkey_dst,
@@ -58,7 +58,7 @@ impl Pack for ThirdParty {
             expected_amount_dst,
         ) = mut_array_refs![dst, 1, 32, 32, 32, 8];
 
-        let ThirdParty {
+        let Escrow {
             is_initialized,
             initializer_pubkey,
             temp_token_account_pubkey,

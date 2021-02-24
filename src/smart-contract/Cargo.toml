@@ -13,7 +13,8 @@ byteorder = "1.4.2"
 spl-token = {version = "3.0.1", features = ["no-entrypoint"]}
 arrayref = "0.3.6"
 thiserror = "1.0.21"
-
+solana-clap-utils = "1.5.6"
+solana-sdk = "1.5.6"
 
 [features]
 exclude_entrypoint = []
