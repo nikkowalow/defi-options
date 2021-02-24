@@ -1,6 +1,4 @@
-export * from './connectWallet'
 export * from './navigationBar'
-export * from './stats'
 export * from './table'
 export * from './disconnectButton'
 export * from './coins'

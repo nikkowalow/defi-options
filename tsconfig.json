@@ -24,7 +24,8 @@
   "include": [
     "src",
     "src/*",
-    "src/typings"
+    "src/typings",
+    "./src/ts/**/*"
   ],
   "jest": {
     "verbose": true,
