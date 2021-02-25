@@ -19,5 +19,6 @@ src/package-lock.json
 yarn.lock
 package-lock.json
 
-src/smart-contract/target
+**/*.js
+**/target
 
