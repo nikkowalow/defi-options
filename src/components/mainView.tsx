@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import { NavigationBar, Coins, Faucet, ConnectButton, OptionChain } from '.';
 import { Coin } from '../models/coin'
-import { connect } from '../solanaHelperMethods';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import solanalogo from '../images/solanalogo.png';
 import { ConnectionProvider } from '../models/connection';
 import { WalletProvider } from '../models/wallet';
+import * as button from '../configs/buttons.json';
 
 interface MainViewState {
     authenticated: boolean;
@@ -28,9 +28,6 @@ export class MainView extends React.Component<any, MainViewState> {
     }
 
 
-    async componentDidMount() {
-        await connect();
-    }
 
 
 
@@ -50,7 +47,9 @@ export class MainView extends React.Component<any, MainViewState> {
                     <NavigationBar authenticated={this.state.authenticated} />
                     <ConnectionProvider>
                         <WalletProvider>
-                            <ConnectButton />
+                            <ConnectButton type={button.type.CONNECTION} />
+                            <ConnectButton type={button.type.FAUCET} />
+
                             <Switch>
                                 <Route path="/coins">
                                     <Coins onSelect={this.onCoinSelect} />

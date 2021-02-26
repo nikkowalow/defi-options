@@ -1,0 +1,7 @@
+{
+    "type": {
+        "FAUCET": "faucetButton",
+        "CONNECTION": "connectionButton",
+        "MINT": "mintButton"
+    }
+}

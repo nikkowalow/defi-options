@@ -2,20 +2,45 @@ import { Button } from "antd";
 import { ButtonProps } from "antd/lib/button";
 import React from "react";
 import { useWallet } from "../models/wallet";
+import { useConnection } from '../models/connection';
+import { Account, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import * as button from '../configs/buttons.json';
 
-export interface ConnectButtonProps
-    extends ButtonProps,
-    React.RefAttributes<HTMLElement> {
-    allowWalletChange?: boolean;
+export interface ConnectButtonProps {
+    type: String;
 }
 
 export const ConnectButton = (props: ConnectButtonProps) => {
     const { connected, connect, provider, disconnect } = useWallet();
-    const { allowWalletChange } = props;
+    const connection = useConnection();
+    const { publicKey } = useWallet();
+
+    const airdrop = () => {
+        if (publicKey) connection.requestAirdrop(publicKey, 2 * LAMPORTS_PER_SOL);
+    }
+
+    // const mintTestToken = () => {
+    //     let mint = new Account();
+    //     updateTokenName(
+    //         mint.publicKey,
+    //         `Test Token ${abbreviateAddress(mint.publicKey)}`,
+    //         `TEST${mint.publicKey.toBase58().slice(0, 2)}`,
+    //     );
+    //     sendTransaction(
+    //         createAndInitializeMint({
+    //             connection: wallet.connection,
+    //             owner: wallet,
+    //             mint,
+    //             amount: 1000,
+    //             decimals: 2,
+    //             initialAccount: new Account(),
+    //         }),
+    //     );
+    // }
 
 
 
-    if (!provider || !allowWalletChange) {
+    if (!provider && props.type == button.type.CONNECTION) {
         if (!connected) {
             return (
                 <Button
@@ -35,10 +60,29 @@ export const ConnectButton = (props: ConnectButtonProps) => {
                 </Button>
             );
         }
-
+    }
+    if (connected && props.type == button.type.FAUCET) {
+        return (
+            <Button
+                className="button"
+                onClick={airdrop}
+            >
+                Faucet SOL
+            </Button>
+        );
     }
 
+    if (props.type == button.type.MINT) {
+        return (
+            <Button
+                className="button"
+            // onClick={mintToken}
+            >
+                Faucet SOL
+            </Button>
+        );
+    }
+
+
     return (<></>);
-
-
 };

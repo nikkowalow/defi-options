@@ -12,7 +12,12 @@
             "LTC": "2",
             "UNI": "7083",
             "AVAX": "5805",
-            "NEM": "873"
+            "NEM": "873",
+            "GRT": "6719",
+            "TRON": "1958",
+            "COMP": "5692",
+            "ALGO": "4030",
+            "SRM": "6187"
         },
         "currencyConversion": "SOL",
         "URL":{

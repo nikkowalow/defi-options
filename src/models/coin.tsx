@@ -1,4 +1,4 @@
-import * as config from '../configs/config.json';
+import * as config from '../configs/coins.json';
 import rp from 'request-promise';
 
 export class Coin {

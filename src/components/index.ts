@@ -1,6 +1,5 @@
 export * from './navigationBar'
 export * from './table'
-export * from './disconnectButton'
 export * from './coins'
 export * from './optionChain'
 export * from './connectButton'

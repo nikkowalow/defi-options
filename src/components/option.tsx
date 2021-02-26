@@ -1,6 +1,6 @@
 import React from 'react';
 import rp from 'request-promise';
-import * as config from '../configs/config.json';
+import * as config from '../configs/coins.json';
 import { Coin } from '../models/coin'
 
 interface OptionProps {
@@ -12,7 +12,7 @@ export class Option extends React.Component<OptionProps> {
     makeOption() {
         return (
             <div>
-                 
+
             </div>
         );
     }

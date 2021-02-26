@@ -1,6 +1,6 @@
 import React from 'react';
-import * as config from '../configs/config.json';
-import { Coin } from '../models/coin'
+import * as config from '../configs/coins.json';
+import { Coin } from '../models/coin';
 
 import { Link } from 'react-router-dom';
 
