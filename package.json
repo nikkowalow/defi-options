@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@project-serum/serum": "^0.13.23",
     "@project-serum/sol-wallet-adapter": "^0.1.5",
     "@solana/web3.js": "^0.90.4",
     "@testing-library/jest-dom": "^5.11.4",

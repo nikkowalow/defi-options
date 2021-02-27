@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import { NavigationBar, Coins, Faucet, ConnectButton, OptionChain } from '.';
+import { NavigationBar, Coins, Faucet, ConnectButton, OptionChain, Mint } from '.';
 import { Coin } from '../models/coin'
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import solanalogo from '../images/solanalogo.png';
@@ -49,7 +49,7 @@ export class MainView extends React.Component<any, MainViewState> {
                         <WalletProvider>
                             <ConnectButton type={button.type.CONNECTION} />
                             <ConnectButton type={button.type.FAUCET} />
-
+                            <Mint />
                             <Switch>
                                 <Route path="/coins">
                                     <Coins onSelect={this.onCoinSelect} />
@@ -57,7 +57,7 @@ export class MainView extends React.Component<any, MainViewState> {
                                 <Route path="/options">
                                     <OptionChain coin={this.state.coin} />
                                 </Route>
-                                <Route>
+                                <Route path="/faucet">
                                     <Faucet />
                                 </Route>
                             </Switch>

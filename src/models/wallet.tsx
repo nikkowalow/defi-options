@@ -204,6 +204,7 @@ export function WalletProvider({ children = null as any }) {
 
 export function useWallet() {
     const { wallet, connected, provider, select } = useContext(WalletContext);
+    console.log(`wallet: ${wallet} connection: ${connected} provider: ${provider}`);
     return {
         wallet,
         connected,
