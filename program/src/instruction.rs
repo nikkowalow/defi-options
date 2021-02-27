@@ -27,16 +27,33 @@ pub enum TokenInstruction {
 }
 
 pub enum OptionInstruction {
+// `[signer]` Seller -> Account selling the options instrument
+// `[writable]` Temporary token account owned by seller, holding underlying asset
+// `[]` Initializer token account for the premium they will receive (token) should the trade go through (premium)
+// `[writable]` the option account, it will hold necessary info about trade
+// `[]` rent sysvar
+// `[]` the token program
+
     SellOption { 
         strike_price: u64,
         expiration_date: u64,
         amount: u64,
     },
+
+// `[signer]` Account buying the options instrument
+// `[writable]` the buyer’s token account for the premium they send
+// `[writable]` the buyer’s token account for the options token they will receive should the trade go through
+// `[writable]` the PDA’s temp token account with the option to get tokens from and eventually close
+
     BuyOption {
         strike_price: u64,
         expiration_date: u64,
         amount: u64,
     },
+
+    ExecuteOption {
+
+    }
 }
 
 impl OptionInstruction {
@@ -54,6 +71,9 @@ impl OptionInstruction {
                 strike_price: strike_price,
                 expiration_date: expiration_date,
                 amount: amount,
+            },
+            2 => Self::ExecuteOption {
+
             },
             _ => return Err(InvalidInstruction.into()),
         })

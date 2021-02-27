@@ -21,21 +21,28 @@ impl Processor {
 
         match instruction {
             OptionInstruction::BuyOption { strike_price, expiration_date, amount } => {
-                msg!("Instruction: BuyOption");
+                msg!("Instruction: Buy Option");
                 Self::process_buy_option(accounts, strike_price, expiration_date, amount, program_id)
             }
             OptionInstruction::SellOption { strike_price, expiration_date, amount } => {
-                msg!("Sell Option");
+                msg!("Instruction: Sell Option");
                 Self::process_sell_option(accounts, strike_price, expiration_date, amount, program_id)
+            }
+            OptionInstruction::ExecuteOption {} => {
+                msg!("Instruction: Execute Option")
             }
         }
     }
 
-    fn process_buy_option(accounts: &[AccountInfo], strike_price: u64, expiration_date: u64, amount:u64, program_id:&Pubkey) -> ProgramResult {
-
+    fn process_buy_option(accounts: &[AccountInfo], strike_price: u64, expiration_date: u64, amount:u64, program_id: &Pubkey) -> ProgramResult {
+        
     }
 
-    fn process_sell_option(accounts: &[AccountInfo], strike_price: u64, expiration_date: u64, amount:u64, program_id:&Pubkey) -> ProgramResult {
+    fn process_sell_option(accounts: &[AccountInfo], strike_price: u64, expiration_date: u64, amount:u64, program_id: &Pubkey) -> ProgramResult {
         
+    }
+
+    fn process_execute_option(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
+
     }
 }
