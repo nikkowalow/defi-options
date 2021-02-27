@@ -19,10 +19,6 @@ use spl_token::{
     state::{Account, Mint},
 };
 
-pub enum EscrowInstruction {
-    InitEscrow { amount: u64 },
-}
-
 pub enum TokenInstruction {
     InitializeMint {
         decimals: u8,
@@ -30,66 +26,56 @@ pub enum TokenInstruction {
     },
 }
 
-pub enum OptionInstructions {
-
-
-    CreateOption {
-
-    },
-    SellOption { //
-        seller: &Pubkey,
-        seller_token_account: Account,
-        init_token_account: Account,
-        option_account: AccountInfo,
-        required_rent: sysvar, //not sure what this does exactly. need to calculate rent exemption later
-        token_program: &Pubkey,
+pub enum OptionInstruction {
+    SellOption { 
+        strike_price: u64,
+        expiration_date: u64,
+        amount: u64,
     },
     BuyOption {
-        buyer: &Pubkey,
-        buyer_token_account: Account, //for sending/receiving premium
-        received_token_account: Account,
-        required_rent: sysvar, //not sure what this does exactly. need to calculate rent exemption later
+        strike_price: u64,
+        expiration_date: u64,
+        amount: u64,
     },
-
 }
 
-
-impl enum OptionInstruction {
-
-    pub fn create_option() [
-
-    ]
-
-    pub fn sell_option()  {
-
-    }
-
-    pub fn buy_option() {
-
-    }
-
-}
-
-
-impl EscrowInstruction {
+impl OptionInstruction {
     pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
-        let (tag, rest) = input.split_first().ok_or(InvalidInstruction)?;
+        let (option_type, rest) = input.split_first().ok_or(InvalidInstruction)?;
+        let (strike_price, expiration_date, amount) = Self::unpack_option_info(rest)?;
 
-        Ok(match tag {
-            0 => Self::InitEscrow {
-                amount: Self::unpack_amount(rest)?,
+        Ok(match option_type {
+            0 => Self::SellOption {
+                strike_price: strike_price,
+                expiration_date: expiration_date,
+                amount: amount,
+            },
+            1 => Self::BuyOption {
+                strike_price: strike_price,
+                expiration_date: expiration_date,
+                amount: amount,
             },
             _ => return Err(InvalidInstruction.into()),
         })
     }
 
-    fn unpack_amount(input: &[u8]) -> Result<u64, ProgramError> {
-        let amount = input
+    fn unpack_option_info(input: &[u8]) -> Result<(u64, u64, u64), ProgramError> {
+        let strike_price = input
             .get(..8)
             .and_then(|slice| slice.try_into().ok())
             .map(u64::from_le_bytes)
             .ok_or(InvalidInstruction)?;
-        Ok(amount)
+        let strike_date = input
+            .get(..8)
+            .and_then(|slice| slice.try_into().ok())
+            .map(u64::from_le_bytes)
+            .ok_or(InvalidInstruction)?;
+        let strike_amount = input
+            .get(..8)
+            .and_then(|slice| slice.try_into().ok())
+            .map(u64::from_le_bytes)
+            .ok_or(InvalidInstruction)?;
+        Ok((strike_price, strike_date, strike_amount))
     }
 }
 
