@@ -1,120 +1,66 @@
-use byteorder::{ByteOrder, LittleEndian};
-
 use solana_program::program_error::ProgramError;
 use std::convert::TryInto;
 
 use crate::error::EscrowError::InvalidInstruction;
 
-use solana_program::{
-    account_info::AccountInfo,
-    entrypoint::ProgramResult,
-    instruction::{AccountMeta, Instruction},
-    msg,
-    program_pack::Pack,
-    pubkey::Pubkey,
-    sysvar,
-};
-use spl_token::{
-    self,
-    state::{Account, Mint},
-};
-
-pub enum TokenInstruction {
-    InitializeMint {
-        decimals: u8,
-        mint_authority: Pubkey,
+pub enum EscrowInstruction {
+    /// Starts the trade by creating and populating an escrow account and transferring ownership of the given temp token account to the PDA
+    ///
+    ///
+    /// Accounts expected:
+    ///
+    /// 0. `[signer]` The account of the person initializing the escrow
+    /// 1. `[writable]` Temporary token account that should be created prior to this instruction and owned by the initializer
+    /// 2. `[]` The initializer's token account for the token they will receive should the trade go through
+    /// 3. `[writable]` The escrow account, it will hold all necessary info about the trade.
+    /// 4. `[]` The rent sysvar
+    /// 5. `[]` The token program
+    InitEscrow {
+        /// The amount party A expects to receive of token Y
+        amount: u64,
+    },
+    /// Accepts a trade
+    ///
+    ///
+    /// Accounts expected:
+    ///
+    /// 0. `[signer]` The account of the person taking the trade
+    /// 1. `[writable]` The taker's token account for the token they send
+    /// 2. `[writable]` The taker's token account for the token they will receive should the trade go through
+    /// 3. `[writable]` The PDA's temp token account to get tokens from and eventually close
+    /// 4. `[writable]` The initializer's main account to send their rent fees to
+    /// 5. `[writable]` The initializer's token account that will receive tokens
+    /// 6. `[writable]` The escrow account holding the escrow info
+    /// 7. `[]` The token program
+    /// 8. `[]` The PDA account
+    Exchange {
+        /// the amount the taker expects to be paid in the other token, as a u64 because that's the max possible supply of a token
+        amount: u64,
     },
 }
 
-pub enum OptionInstruction {
-// `[signer]` Seller -> Account selling the options instrument
-// `[writable]` Temporary token account owned by seller, holding underlying asset
-// `[]` Initializer token account for the premium they will receive (token) should the trade go through (premium)
-// `[writable]` the option account, it will hold necessary info about trade
-// `[]` rent sysvar
-// `[]` the token program
-
-    SellOption { 
-        strike_price: u64,
-        expiration_date: u64,
-        amount: u64,
-    },
-
-// `[signer]` Account buying the options instrument
-// `[writable]` the buyer’s token account for the premium they send
-// `[writable]` the buyer’s token account for the options token they will receive should the trade go through
-// `[writable]` the PDA’s temp token account with the option to get tokens from and eventually close
-
-    BuyOption {
-        strike_price: u64,
-        expiration_date: u64,
-        amount: u64,
-    },
-
-    ExecuteOption {
-
-    }
-}
-
-impl OptionInstruction {
+impl EscrowInstruction {
+    /// Unpacks a byte buffer into a [EscrowInstruction](enum.EscrowInstruction.html).
     pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
-        let (option_type, rest) = input.split_first().ok_or(InvalidInstruction)?;
-        let (strike_price, expiration_date, amount) = Self::unpack_option_info(rest)?;
+        let (tag, rest) = input.split_first().ok_or(InvalidInstruction)?;
 
-        Ok(match option_type {
-            0 => Self::SellOption {
-                strike_price: strike_price,
-                expiration_date: expiration_date,
-                amount: amount,
+        Ok(match tag {
+            0 => Self::InitEscrow {
+                amount: Self::unpack_amount(rest)?,
             },
-            1 => Self::BuyOption {
-                strike_price: strike_price,
-                expiration_date: expiration_date,
-                amount: amount,
-            },
-            2 => Self::ExecuteOption {
-
+            1 => Self::Exchange {
+                amount: Self::unpack_amount(rest)?,
             },
             _ => return Err(InvalidInstruction.into()),
         })
     }
 
-    fn unpack_option_info(input: &[u8]) -> Result<(u64, u64, u64), ProgramError> {
-        let strike_price = input
+    fn unpack_amount(input: &[u8]) -> Result<u64, ProgramError> {
+        let amount = input
             .get(..8)
             .and_then(|slice| slice.try_into().ok())
             .map(u64::from_le_bytes)
             .ok_or(InvalidInstruction)?;
-        let strike_date = input
-            .get(..8)
-            .and_then(|slice| slice.try_into().ok())
-            .map(u64::from_le_bytes)
-            .ok_or(InvalidInstruction)?;
-        let strike_amount = input
-            .get(..8)
-            .and_then(|slice| slice.try_into().ok())
-            .map(u64::from_le_bytes)
-            .ok_or(InvalidInstruction)?;
-        Ok((strike_price, strike_date, strike_amount))
-    }
-}
-
-impl TokenInstruction {
-    pub fn initialize_mint(
-        token_program_id: &Pubkey,
-        mint_pubkey: &Pubkey,
-        mint_authority_pubkey: &Pubkey,
-        decimals: u8,
-    ) -> ProgramResult {
-        let mut data = TokenInstruction::InitializeMint {
-            decimals,
-            mint_authority: *mint_authority_pubkey,
-        };
-        let accounts = vec![
-            AccountMeta::new(*mint_pubkey, false),
-            AccountMeta::new_readonly(sysvar::rent::id(), false),
-        ];
-
-        Ok(())
+        Ok(amount)
     }
 }
