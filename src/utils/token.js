@@ -1,29 +1,25 @@
 import * as BufferLayout from 'buffer-layout';
+import {LAYOUT, ACCOUNT_LAYOUT, MINT_LAYOUT} from './layouts';
 import {
-  SystemProgram,
-  Account,
-  Transaction,
-  PublicKey,
-  TransactionInstruction,
-  SYSVAR_RENT_PUBKEY
+  newAccountWithLamports,
+  instructionMaxSpan,
+  encodeTokenInstructionData,
+  signAndSendTransaction
+} from './utils';
+import { 
+   Account,
+   SystemProgram, 
+   Transaction,
+   SYSVAR_RENT_PUBKEY,
+   TransactionInstruction,
+   PublicKey,
+   LAMPORTS_PER_SOL,
+   sendAndConfirmTransaction,
 } from '@solana/web3.js';
 import * as solana from '../configs/solana.json';
 
-export const MINT_LAYOUT = BufferLayout.struct([
-  BufferLayout.blob(44),
-  BufferLayout.u8('decimals'),
-  BufferLayout.blob(37),
-]);
+const TOKEN_PROGRAM_ID = new PublicKey(solana.programs.TOKEN_PROGRAM_ID);
 
-
-export const ACCOUNT_LAYOUT = BufferLayout.struct([
-  BufferLayout.blob(32, 'mint'),
-  BufferLayout.blob(32, 'owner'),
-  BufferLayout.nu64('amount'),
-  BufferLayout.blob(93),
-]);
-
-const LAYOUT = BufferLayout.union(BufferLayout.u8('instruction'));
 LAYOUT.addVariant(
   0,
   BufferLayout.struct([
@@ -34,45 +30,24 @@ LAYOUT.addVariant(
   ]),
   'initializeMint',
 );
+
 LAYOUT.addVariant(1, BufferLayout.struct([]), 'initializeAccount');
-
-const TOKEN_PROGRAM_ID = new PublicKey(solana.programs.TOKEN_PROGRAM_ID);
-
-const instructionMaxSpan = Math.max(
-  ...Object.values(LAYOUT.registry).map((r) => r.span),
+LAYOUT.addVariant(
+  3,
+  BufferLayout.struct([BufferLayout.nu64('amount')]),
+  'transfer',
 );
-
-function encodeTokenInstructionData(instruction) {
-  console.log(`encoding: ${instruction}`);
-  let b = Buffer.alloc(instructionMaxSpan);
-  let span = LAYOUT.encode(instruction, b);
-  return b.slice(0, span);
-}
-
-
-export function initializeMint({
-  mint,
-  decimals,
-  mintAuthority,
-  freezeAuthority,
-}) {
-  let keys = [
-    { pubkey: mint, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-  ];
-  return new TransactionInstruction({
-    keys,
-    data: encodeTokenInstructionData({
-      initializeMint: {
-        decimals,
-        mintAuthority: mintAuthority.toBuffer(),
-        freezeAuthorityOption: !!freezeAuthority,
-        freezeAuthority: (freezeAuthority || new PublicKey("FS86giTYW3V2cgfQwC9rpnXyTiwYpyPZBX5LjbD3oTNq")).toBuffer(),
-      },
-    }),
-    programId: TOKEN_PROGRAM_ID,
-  });
-}
+LAYOUT.addVariant(
+  7,
+  BufferLayout.struct([BufferLayout.nu64('amount')]),
+  'mintTo',
+);
+LAYOUT.addVariant(
+  8,
+  BufferLayout.struct([BufferLayout.nu64('amount')]),
+  'burn',
+);
+LAYOUT.addVariant(9, BufferLayout.struct([]), 'closeAccount');
 
 export function mintTo({ mint, destination, amount, mintAuthority }) {
   let keys = [
@@ -84,10 +59,7 @@ export function mintTo({ mint, destination, amount, mintAuthority }) {
     keys,
     data: encodeTokenInstructionData({
       mintTo: {
-        mint,
-        destination,
         amount,
-        mintAuthority
       },
     }),
     programId: TOKEN_PROGRAM_ID,
@@ -110,46 +82,39 @@ export function initializeAccount({ account, mint, owner }) {
   });
 }
 
-
-
-export async function signAndSendTransaction(
-  connection,
-  transaction,
-  wallet,
-  signers,
-  skipPreflight = false,
-) {
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash('max')
-  ).blockhash;
-  transaction.setSigners(
-    // fee payed by the wallet owner
-    wallet.publicKey,
-    ...signers.map((s) => s.publicKey),
-  );
-
-  if (signers.length > 0) {
-    transaction.partialSign(...signers);
-  }
-
-  transaction = await wallet.signTransaction(transaction);
-  const rawTransaction = transaction.serialize();
-  return await connection.sendRawTransaction(rawTransaction, {
-    skipPreflight,
-    preflightCommitment: 'single',
+export function initializeMint({
+  mint,
+  decimals,
+  mintAuthority,
+  freezeAuthority,
+}) {
+  let keys = [
+    { pubkey: mint, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+  ];
+  return new TransactionInstruction({
+    keys,
+    data: encodeTokenInstructionData({
+      initializeMint: {
+        decimals,
+        mintAuthority: mintAuthority.toBuffer(),
+        freezeAuthorityOption: !!freezeAuthority,
+        freezeAuthority: (freezeAuthority).toBuffer(),
+      },
+    }),
+    programId: TOKEN_PROGRAM_ID,
   });
 }
 
 export async function createAndInitializeMint({
   connection,
-  owner, // Wallet for paying fees and allowed to mint new tokens
-  mint, // Account to hold token information
-  amount, // Number of tokens to issue
+  owner, 
+  mint, 
+  amount, 
   decimals,
-  initialAccount, // Account to hold newly issued tokens, if amount > 0
+  initialAccount, 
 }) {
   let transaction = new Transaction();
-
   transaction.add(
     SystemProgram.createAccount({
       fromPubkey: owner.publicKey,
@@ -161,16 +126,14 @@ export async function createAndInitializeMint({
       programId: TOKEN_PROGRAM_ID,
     }),
   );
-
   transaction.add(
     initializeMint({
       mint: mint.publicKey,
       decimals,
       mintAuthority: owner.publicKey,
-      freezeAuthority: owner.publicKey,
+      freezeAuthority: owner.publicKey
     }),
   );
-
   let signers = [mint];
   if (amount > 0) {
     transaction.add(
@@ -185,7 +148,6 @@ export async function createAndInitializeMint({
       }),
     );
     signers.push(initialAccount);
-
     transaction.add(
       initializeAccount({
         account: initialAccount.publicKey,
@@ -193,7 +155,6 @@ export async function createAndInitializeMint({
         owner: owner.publicKey,
       }),
     );
-
     transaction.add(
       mintTo({
         mint: mint.publicKey,
@@ -203,24 +164,34 @@ export async function createAndInitializeMint({
       }),
     );
   }
-
+    console.log('owner');
+    console.log(owner.publicKey.toString());
+    console.log('mint');
+    console.log(mint.publicKey.toString());
   return await signAndSendTransaction(connection, transaction, owner, signers);
 }
 
-  export const mintToken = async (wallet, connection) => {
-    let mint = new Account();
-
-    console.log(`wallet connection: ${wallet.connection}`);
-    try {
-      await createAndInitializeMint({
-        connection: connection,
-        owner: wallet,
-        mint,
-        amount: 1000,
-        decimals: 2,
-        initialAccount: new Account(),
+export const mintToken = async (wallet, connection) => {
+  let mint = new Account();
+  let exchange = new Account();
+  await connection.requestAirdrop(exchange.publicKey, 2 * LAMPORTS_PER_SOL);
+  console.log(await connection.getBalance(exchange.publicKey));
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: exchange.publicKey,
+        lamports: await connection.getMinimumBalanceForRentExemption(
+          ACCOUNT_LAYOUT.span,
+        ),
+        space: ACCOUNT_LAYOUT.span,
+        programId: TOKEN_PROGRAM_ID,
       });
-    } catch(error){
-      console.error(error);
-    }
-  }
+        console.log(await connection.getBalance(exchange.publicKey));
+    createAndInitializeMint({
+      connection: connection,
+      owner: exchange,
+      mint,
+      amount: 10000,
+      decimals: 2,
+      initialAccount: new Account(),
+    });
+}
