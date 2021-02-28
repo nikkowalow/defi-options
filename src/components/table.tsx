@@ -77,7 +77,6 @@ export class Table extends React.Component<TableProps, TableState> {
     }
 
     renderOption = (option: any, index: any) => {
-        console.log('current option' + option);
         return (
 
             <tr key={index} >

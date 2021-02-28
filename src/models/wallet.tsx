@@ -1,7 +1,7 @@
 import type { PublicKey } from "@solana/web3.js";
 
 import Wallet from "@project-serum/sol-wallet-adapter";
-import { Transaction } from "@solana/web3.js";
+import { Transaction, Connection } from "@solana/web3.js";
 import { Button, Modal } from "antd";
 import EventEmitter from "eventemitter3";
 import React, {
@@ -12,7 +12,7 @@ import React, {
     useState,
 } from "react";
 import { useConnectionConfig } from "./connection";
-
+import * as solana from '../configs/solana.json';
 
 const ASSETS_URL =
     "https://raw.githubusercontent.com/solana-labs/oyster/main/assets/wallets/";
@@ -36,16 +36,17 @@ const WalletContext = React.createContext<{
     connected: boolean;
     select: () => void;
     provider: typeof WALLET_PROVIDERS[number] | undefined;
+    connection: Connection;
 }>({
     wallet: undefined,
     connected: false,
     select() { },
     provider: undefined,
+    connection: new Connection(solana.endpoints.DEVNET_CLUSTER, 'singleGossip'),
 });
 
 export function useLocalStorageState(key: string, defaultState?: string) {
     const [state, setState] = useState(() => {
-        // NOTE: Not sure if this is ok
         const storedState = localStorage.getItem(key);
         if (storedState) {
             return JSON.parse(storedState);
@@ -74,7 +75,7 @@ export function useLocalStorageState(key: string, defaultState?: string) {
 
 
 export function WalletProvider({ children = null as any }) {
-    const { endpoint } = useConnectionConfig();
+    const { endpoint, connection } = useConnectionConfig();
 
     const [autoConnect, setAutoConnect] = useState(false);
     const [providerUrl, setProviderUrl] = useLocalStorageState("walletProvider");
@@ -154,6 +155,7 @@ export function WalletProvider({ children = null as any }) {
                 connected,
                 select,
                 provider,
+                connection,
             }}
         >
             {children}
@@ -203,8 +205,7 @@ export function WalletProvider({ children = null as any }) {
 }
 
 export function useWallet() {
-    const { wallet, connected, provider, select } = useContext(WalletContext);
-    console.log(`wallet: ${wallet} connection: ${connected} provider: ${provider}`);
+    const { wallet, connected, provider, select, connection } = useContext(WalletContext);
     return {
         wallet,
         connected,
@@ -217,5 +218,6 @@ export function useWallet() {
         disconnect() {
             wallet?.disconnect();
         },
+        connection
     };
 }

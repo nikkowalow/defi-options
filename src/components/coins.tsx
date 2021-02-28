@@ -39,7 +39,6 @@ export class Coins extends React.Component<CoinsProps, CoinsState> {
             .then(response => response.json()).then(response => response.data).then(response => {
                 let coins: Coin[] = [] as Coin[];
                 Object.keys(response).forEach(key => {
-                    console.log(response)
                     coins.push(Coin.parse(response[key]));
                 });
                 this.setState({ coins: coins })

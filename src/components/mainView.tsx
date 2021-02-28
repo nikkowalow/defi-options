@@ -27,16 +27,11 @@ export class MainView extends React.Component<any, MainViewState> {
         } as MainViewState;
     }
 
-
-
-
-
     connect = async (status: boolean) => {
         this.setState({ authenticated: status });
     }
 
     onCoinSelect = (coin: Coin) => {
-        console.log(`COIN: ${coin.name}`);
         this.setState({ coin: coin });
     }
 
@@ -47,10 +42,8 @@ export class MainView extends React.Component<any, MainViewState> {
                     <NavigationBar authenticated={this.state.authenticated} />
                     <ConnectionProvider>
                         <WalletProvider>
-                            <ConnectButton type={button.type.CONNECTION} />
-                            <ConnectButton type={button.type.FAUCET} />
-                            <Mint />
-                            <Switch>
+                            <ConnectButton key="button1" />
+                            <Switch key="switch1" >
                                 <Route path="/coins">
                                     <Coins onSelect={this.onCoinSelect} />
                                 </Route>
@@ -59,6 +52,9 @@ export class MainView extends React.Component<any, MainViewState> {
                                 </Route>
                                 <Route path="/faucet">
                                     <Faucet />
+                                </Route>
+                                <Route path="/mint">
+                                    <Mint />
                                 </Route>
                             </Switch>
                         </WalletProvider >
