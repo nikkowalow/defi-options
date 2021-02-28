@@ -16,7 +16,7 @@ pub enum EscrowInstruction {
     /// 5. `[] The token program
     InitEscrow {
         /// The length of the instrument_id string to be initialized
-        length: u64,
+        amount: u64,
     },
 
 
@@ -40,7 +40,7 @@ pub enum EscrowInstruction {
     /// 8. `[]` The PDA account
     Exchange {
         /// The length of the instrument_id string to be executed
-        length: u64,
+        amount: u64,
     },
 }
 
