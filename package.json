@@ -1,5 +1,5 @@
 {
-  "name": "pollana",
+  "name": "defi-options",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -19,6 +19,7 @@
     "classnames": "^2.2.6",
     "greeks": "^1.0.0",
     "mz": "^2.7.0",
+    "notistack": "^1.0.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",

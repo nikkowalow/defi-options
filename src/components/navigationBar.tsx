@@ -22,7 +22,7 @@ export class NavigationBar extends React.Component<NavigationBarProps> {
 
 
                 <Link to="/coins">
-                    <button className="play-button">
+                    <button key="navigation-button" className="play-button">
                         View Coins
                     </button>
                 </Link>

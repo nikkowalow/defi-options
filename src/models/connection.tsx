@@ -60,8 +60,8 @@ export function useLocalStorageState(key: string, defaultState?: string) {
 export const ConnectionContext = React.createContext<ConnectionConfig>({
     endpoint: CLUSTER,
     setEndpoint: () => { },
-    connection: new Connection(CLUSTER, 'singleGossip'),
-    sendConnection: new Connection(CLUSTER, 'singleGossip'),
+    connection: new Connection(CLUSTER, 'recent'),
+    sendConnection: new Connection(CLUSTER, 'recent'),
     env: ENDPOINTS[0].name,
 });
 
@@ -72,10 +72,10 @@ export function ConnectionProvider({ children = undefined as any }) {
     );
 
 
-    const connection = useMemo(() => new Connection(ENDPOINTS[0].endpoint, 'singleGossip'), [
+    const connection = useMemo(() => new Connection(ENDPOINTS[0].endpoint, 'recent'), [
         endpoint,
     ]);
-    const sendConnection = useMemo(() => new Connection(endpoint, 'singleGossip'), [
+    const sendConnection = useMemo(() => new Connection(ENDPOINTS[0].endpoint, 'recent'), [
         endpoint,
     ]);
 
@@ -143,5 +143,6 @@ export function useConnectionConfig() {
         endpoint: context.endpoint,
         setEndpoint: context.setEndpoint,
         env: context.env,
+        connection: context.connection
     };
 }

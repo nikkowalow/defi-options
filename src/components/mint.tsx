@@ -1,16 +1,19 @@
 import React, { useCallback } from "react";
-import { useConnection } from "../models/connection";
 import { useWallet } from "../models/wallet";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { mintToken } from '../utils/token';
+import { LAMPORTS_PER_SOL, Connection, PublicKey } from "@solana/web3.js";
+import { mintToken } from '../utils/token(old).js';
+import { useConnection } from '../models/connection';
 
 export const Mint = () => {
 
-    const wallet = useWallet();
+    const { wallet, connection } = useWallet();
+    const connection2 = useConnection();
+    const connection3 = new Connection('https://devnet.solana.com', 'recent');
 
-    const mint = () => {
-        console.log('mint');
-        mintToken(wallet);
+    const mint = async () => {
+        console.log(`OnClick - minting...`);
+        mintToken(wallet, connection);
+
     }
 
     return (

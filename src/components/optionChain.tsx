@@ -23,9 +23,6 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
         this.updateQuote = this.updateQuote.bind(this)
     }
     componentDidMount() {
-        console.log(this.props)
-        console.log(this.props.coin)
-        console.log(`coinName from -options.tsx: ${this.props.coin?.name}`);
         this.props.coin?.quote(this.updateQuote);
     }
 
@@ -48,7 +45,7 @@ export class OptionChain extends React.Component<OptionChainProps, OptionChainSt
                     <img src={this.props.coin?.logo} className="coin-icon" />
                     ${this.state.price}
                 </h2>
-                
+
                 {table}
             </div >
         );
