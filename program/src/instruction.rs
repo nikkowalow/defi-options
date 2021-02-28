@@ -4,27 +4,32 @@ use std::convert::TryInto;
 use crate::error::EscrowError::InvalidInstruction;
 
 pub enum EscrowInstruction {
-    /// Starts the trade by creating and populating an escrow account and transferring ownership of the given temp token account to the PDA
-    ///
+    /// Creates the option token(s) by creating (or using if existing) an option account, transferring underlying asset to PDA, and giving options token to user
     ///
     /// Accounts expected:
-    ///
-    /// 0. `[signer]` The account of the person initializing the escrow
-    /// 1. `[writable]` Temporary token account that should be created prior to this instruction and owned by the initializer
-    /// 2. `[]` The initializer's token account for the token they will receive should the trade go through
-    /// 3. `[writable]` The escrow account, it will hold all necessary info about the trade.
+    /// 
+    /// 0. `[signer]` The account of the seller of the particular option
+    /// 1. `[writable]` The underlying asset
+    /// 2. `[writable]` A mint of an options token
+    /// 3. `[]` The initializer's token account for the options token they will recieve if creation is successful
     /// 4. `[]` The rent sysvar
-    /// 5. `[]` The token program
+    /// 5. `[] The token program
     InitEscrow {
-        /// The amount party A expects to receive of token Y
-        amount: u64,
+        /// The length of the instrument_id string to be initialized
+        length: u64,
     },
+
+
     /// Accepts a trade
     ///
     ///
     /// Accounts expected:
     ///
-    /// 0. `[signer]` The account of the person taking the trade
+    /// 0. `[signer]` The account of the option executer
+    /// 1. `[writable]` The executer's token account for the option token
+    /// 2. `[writable]` The taker's token account for the underlying asset to recieve
+    /// 3. `[writable]` The 
+
     /// 1. `[writable]` The taker's token account for the token they send
     /// 2. `[writable]` The taker's token account for the token they will receive should the trade go through
     /// 3. `[writable]` The PDA's temp token account to get tokens from and eventually close
@@ -34,8 +39,8 @@ pub enum EscrowInstruction {
     /// 7. `[]` The token program
     /// 8. `[]` The PDA account
     Exchange {
-        /// the amount the taker expects to be paid in the other token, as a u64 because that's the max possible supply of a token
-        amount: u64,
+        /// The length of the instrument_id string to be executed
+        length: u64,
     },
 }
 
