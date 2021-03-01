@@ -5,6 +5,7 @@
         "MAINNET_CLUSTER": "https://mainnet.solana.com"
     },
     "programs" :{
-        "TOKEN_PROGRAM_ID": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        "TOKEN_PROGRAM_ID": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "DERIVATIVES_EXCHANGE_PROGRAM_ID": "dWeH9jwHRLQdkvAWQ8qJqjEDDhNV13mBqcXG2RNEpeq"
     }
 }

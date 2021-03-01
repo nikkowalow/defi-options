@@ -1,7 +1,10 @@
 import {LAYOUT} from './layouts';
 import {
   Account,
+  SYSVAR_RENT_PUBKEY,
+  TransactionInstruction
 } from '@solana/web3.js';
+import {TOKEN_PROGRAM_ID} from './token';
 
 export const instructionMaxSpan = Math.max(
   ...Object.values(LAYOUT.registry).map((r) => r.span),
@@ -53,7 +56,6 @@ export async function signAndSendTransaction(
     wallet.publicKey,
     ...signers.map((s) => s.publicKey),
   );
-    console.log(signers);
   if (signers.length > 0) {
     await transaction.partialSign(...signers);
   }
@@ -67,3 +69,5 @@ export async function signAndSendTransaction(
     preflightCommitment: 'single',
   });
 }
+
+

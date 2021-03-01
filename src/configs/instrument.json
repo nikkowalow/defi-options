@@ -1,0 +1,11 @@
+{
+    "solana": {
+        "lotSize": 100
+    },
+    "BTC": {
+        "lotsize": 5
+    },
+    "ETH": {
+        "lotsize": 50
+    }
+}

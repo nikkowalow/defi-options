@@ -43,6 +43,7 @@ export class MainView extends React.Component<any, MainViewState> {
                     <ConnectionProvider>
                         <WalletProvider>
                             <ConnectButton key="button1" />
+                            <Mint />
                             <Switch key="switch1" >
                                 <Route path="/coins">
                                     <Coins onSelect={this.onCoinSelect} />
@@ -53,9 +54,7 @@ export class MainView extends React.Component<any, MainViewState> {
                                 <Route path="/faucet">
                                     <Faucet />
                                 </Route>
-                                <Route path="/mint">
-                                    <Mint />
-                                </Route>
+
                             </Switch>
                         </WalletProvider >
                     </ConnectionProvider >

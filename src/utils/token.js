@@ -1,11 +1,4 @@
 import * as BufferLayout from 'buffer-layout';
-import {LAYOUT, ACCOUNT_LAYOUT, MINT_LAYOUT} from './layouts';
-import {
-  newAccountWithLamports,
-  instructionMaxSpan,
-  encodeTokenInstructionData,
-  signAndSendTransaction
-} from './utils';
 import { 
    Account,
    SystemProgram, 
@@ -17,8 +10,12 @@ import {
    sendAndConfirmTransaction,
 } from '@solana/web3.js';
 import * as solana from '../configs/solana.json';
+import {signAndSendTransaction} from './utils';
+import * as instrument from '../configs/instrument.json';
 
-const TOKEN_PROGRAM_ID = new PublicKey(solana.programs.TOKEN_PROGRAM_ID);
+export const TOKEN_PROGRAM_ID = new PublicKey(solana.programs.TOKEN_PROGRAM_ID);
+const LAYOUT = BufferLayout.union(BufferLayout.u8('instruction'));
+
 
 LAYOUT.addVariant(
   0,
@@ -49,6 +46,15 @@ LAYOUT.addVariant(
 );
 LAYOUT.addVariant(9, BufferLayout.struct([]), 'closeAccount');
 
+
+
+export const ACCOUNT_LAYOUT = BufferLayout.struct([
+  BufferLayout.blob(32, 'mint'),
+  BufferLayout.blob(32, 'owner'),
+  BufferLayout.nu64('amount'),
+  BufferLayout.blob(93),
+]);
+
 export function mintTo({ mint, destination, amount, mintAuthority }) {
   let keys = [
     { pubkey: mint, isSigner: false, isWritable: true },
@@ -66,6 +72,24 @@ export function mintTo({ mint, destination, amount, mintAuthority }) {
   });
 }
 
+
+
+const instructionMaxSpan = Math.max(
+  ...Object.values(LAYOUT.registry).map((r) => r.span),
+);
+
+
+
+
+function encodeTokenInstructionData(instruction) {
+  let b = Buffer.alloc(instructionMaxSpan);
+  let span = LAYOUT.encode(instruction, b);
+  return b.slice(0, span);
+}
+
+
+
+
 export function initializeAccount({ account, mint, owner }) {
   let keys = [
     { pubkey: account, isSigner: false, isWritable: true },
@@ -81,6 +105,40 @@ export function initializeAccount({ account, mint, owner }) {
     programId: TOKEN_PROGRAM_ID,
   });
 }
+
+
+
+
+export async function depositCollateral(
+  connection,
+  wallet,  
+  amount,
+) {
+
+  let depositer = new PublicKey("FS86giTYW3V2cgfQwC9rpnXyTiwYpyPZBX5LjbD3oTNq");
+  let receiver = new PublicKey("6VF8J7jKnBbTEooSG25rFk83sqamkZL3vGDQFxTWYQoT");
+
+  console.log(`wallet balance: ${await connection.getBalance(wallet.publicKey)}`);
+    console.log(`receiver balance: ${await connection.getBalance(receiver)}`);
+
+  const tx = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: wallet.publicKey,
+      toPubkey: receiver,
+      lamports: amount,
+    }),
+  );
+  return await signAndSendTransaction(connection, tx, wallet, []);
+}
+
+
+
+
+export const MINT_LAYOUT = BufferLayout.struct([
+  BufferLayout.blob(44),
+  BufferLayout.u8('decimals'),
+  BufferLayout.blob(37),
+]);
 
 export function initializeMint({
   mint,
@@ -106,13 +164,15 @@ export function initializeMint({
   });
 }
 
+
 export async function createAndInitializeMint({
-  connection,
+  connection,  
   owner, 
   mint, 
-  amount, 
+  amount,
   decimals,
-  initialAccount, 
+  initialAccount,
+  depositer
 }) {
   let transaction = new Transaction();
   transaction.add(
@@ -165,7 +225,7 @@ export async function createAndInitializeMint({
     );
   }
     console.log('owner');
-    console.log(owner.publicKey.toString());
+    console.log(initialAccount.publicKey.toString());
     console.log('mint');
     console.log(mint.publicKey.toString());
   return await signAndSendTransaction(connection, transaction, owner, signers);
@@ -175,23 +235,54 @@ export const mintToken = async (wallet, connection) => {
   let mint = new Account();
   let exchange = new Account();
   await connection.requestAirdrop(exchange.publicKey, 2 * LAMPORTS_PER_SOL);
-  console.log(await connection.getBalance(exchange.publicKey));
-      SystemProgram.createAccount({
-        fromPubkey: wallet.publicKey,
-        newAccountPubkey: exchange.publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(
-          ACCOUNT_LAYOUT.span,
-        ),
-        space: ACCOUNT_LAYOUT.span,
-        programId: TOKEN_PROGRAM_ID,
-      });
-        console.log(await connection.getBalance(exchange.publicKey));
+    //   SystemProgram.createAccount({
+    //     fromPubkey: wallet.publicKey,
+    //     newAccountPubkey: exchange.publicKey,
+    //     lamports: await connection.getMinimumBalanceForRentExemption(
+    //       ACCOUNT_LAYOUT.span,
+    //     ),
+    //     space: ACCOUNT_LAYOUT.span,
+    //     programId: TOKEN_PROGRAM_ID,
+    //   });
+
+
+      let initialAccount = new Account();
+
     createAndInitializeMint({
       connection: connection,
       owner: exchange,
       mint,
-      amount: 10000,
-      decimals: 2,
-      initialAccount: new Account(),
+      amount: 100,
+      decimals: 0,
+      initialAccount,
+      depositer: new Account()
     });
+}
+
+
+
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function newAccountWithLamports(
+  connection,
+  lamports = 1000000,
+) {
+  const account = new Account();
+
+  let retries = 10;
+  await connection.requestAirdrop(account.publicKey, lamports);
+  for (;;) {
+    await sleep(500);
+    if (lamports == (await connection.getBalance(account.publicKey))) {
+      return account;
+    }
+    if (--retries <= 0) {
+      break;
+    }
+    console.log(`Airdrop retry ${retries}`);
+  }
+  throw new Error(`Airdrop of ${lamports} failed`);
 }
