@@ -11,7 +11,9 @@ use solana_program::{
 
 use spl_token::state::Account as TokenAccount;
 
-use crate::{error::EscrowError, instruction::EscrowInstruction, state::Escrow};
+use crate::{error::OptionFactoryError, 
+    instruction::OptionFactoryInstruction, 
+    state::OptionModel};
 
 pub struct Processor;
 impl Processor {
@@ -20,23 +22,62 @@ impl Processor {
         accounts: &[AccountInfo],
         instruction_data: &[u8],
     ) -> ProgramResult {
-        let instruction = EscrowInstruction::unpack(instruction_data)?;
+        let instruction = OptionFactoryInstruction::unpack(instruction_data)?;
 
         match instruction {
-            EscrowInstruction::InitEscrow { amount } => {
-                msg!("Instruction: InitEscrow");
-                Self::process_init_escrow(accounts, amount, program_id)
+            OptionFactoryInstruction::Create { option } => {
+                msg!("Instruction: Create Option");
+                Self::create_option(accounts, option, program_id)
             }
-            EscrowInstruction::Exchange { amount } => {
+            OptionFactoryInstruction::Execute { option } => {
                 msg!("Instruction: Exchange");
-                Self::process_exchange(accounts, amount, program_id)
+                Self::execute_option(accounts, option, program_id)
             }
         }
     }
 
+    fn create_option(
+        accounts: &[AccountInfo],
+        option: OptionModel,
+        program_id: &Pubkey,
+    ) -> ProgramResult {
+        let account_info_iter = &mut accounts.iter();
+        let seller = next_account_info(account_info_iter)?;
+        if !seller.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+
+        let instrument_id = option.get_instrument_id()?;
+
+        let (pda, bumpseed) = Pubkey::find_program_address(&[instrument_id.into_bytes().as_slice()], program_id: &Pubkey);
+
+        let owner_change_ix = spl_token::instruction::set_authority(
+            token_program.key, temp_mint_account.key, Some(&pda), spl_token::AuthorityType::MintToken, owner_pubkey: &Pubkey, signer_pubkeys: &[&Pubkey])
+
+        
+        
+        let pda_option_mint_account = 
+
+        let underlying_asset_token_account = next_account_info(account_info_iter)?;
+
+
+        let option_token_mint_account = next_account_info(account_info_iter)?;
+
+
+
+    }   
+
+    fn execute_option(
+        accounts: &[AccountInfo],
+        amount: OptionModel,
+        program_id: &Pubkey,
+    ) -> ProgramResult {
+        
+    }
+
     fn process_init_escrow(
         accounts: &[AccountInfo],
-        amount: u64,
+        amount: OptionModel,
         program_id: &Pubkey,
     ) -> ProgramResult {
         let account_info_iter = &mut accounts.iter();

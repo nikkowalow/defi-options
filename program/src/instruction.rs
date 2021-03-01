@@ -1,9 +1,19 @@
 use solana_program::program_error::ProgramError;
-use std::convert::TryInto;
+use std::{
+    convert::TryInto,
+    string::String,
+};
 
-use crate::error::EscrowError::InvalidInstruction;
+use solana_program::{
+    program_pack::{IsInitialized, Pack},
+};
 
-pub enum EscrowInstruction {
+use crate::{
+    state::OptionModel,
+    error::OptionFactoryError::InvalidInstruction,
+};
+
+pub enum OptionFactoryInstruction {
     /// Creates the option token(s) by creating (or using if existing) an option account, transferring underlying asset to PDA, and giving options token to user
     ///
     /// Accounts expected:
@@ -14,9 +24,9 @@ pub enum EscrowInstruction {
     /// 3. `[]` The initializer's token account for the options token they will recieve if creation is successful
     /// 4. `[]` The rent sysvar
     /// 5. `[] The token program
-    InitEscrow {
+    Create {
         /// The length of the instrument_id string to be initialized
-        amount: u64,
+        option: OptionModel,
     },
 
 
@@ -38,34 +48,25 @@ pub enum EscrowInstruction {
     /// 6. `[writable]` The escrow account holding the escrow info
     /// 7. `[]` The token program
     /// 8. `[]` The PDA account
-    Exchange {
+    Execute {
         /// The length of the instrument_id string to be executed
-        amount: u64,
+        option: OptionModel,
     },
 }
 
-impl EscrowInstruction {
+impl OptionFactoryInstruction {
     /// Unpacks a byte buffer into a [EscrowInstruction](enum.EscrowInstruction.html).
     pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
-        let (tag, rest) = input.split_first().ok_or(InvalidInstruction)?;
+        let (tag, instrument_id) = input.split_first().ok_or(InvalidInstruction)?;
 
         Ok(match tag {
-            0 => Self::InitEscrow {
-                amount: Self::unpack_amount(rest)?,
+            0 => Self::Create {
+                option: OptionModel::unpack_from_slice(instrument_id)?,
             },
-            1 => Self::Exchange {
-                amount: Self::unpack_amount(rest)?,
+            1 => Self::Execute {
+                option: OptionModel::unpack_from_slice(instrument_id)?,
             },
             _ => return Err(InvalidInstruction.into()),
         })
-    }
-
-    fn unpack_amount(input: &[u8]) -> Result<u64, ProgramError> {
-        let amount = input
-            .get(..8)
-            .and_then(|slice| slice.try_into().ok())
-            .map(u64::from_le_bytes)
-            .ok_or(InvalidInstruction)?;
-        Ok(amount)
     }
 }
