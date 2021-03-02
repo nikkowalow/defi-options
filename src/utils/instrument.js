@@ -1,6 +1,3 @@
-
-
-
 import {ACCOUNT_LAYOUT, MINT_LAYOUT, OPTION_LAYOUT} from './layouts';
 import {
   Account,
@@ -15,7 +12,12 @@ import {signAndSendTransaction} from './utils';
 import {encodeTokenInstructionData} from './utils';
 
 
+
+
+
 const TOKEN_PROGRAM_ID = new PublicKey(solana.programs.TOKEN_PROGRAM_ID);
+
+
 
 
 export function createInstrumentID(underlyingAsset, expirationDate, strikePrice, optionType) {
@@ -49,6 +51,9 @@ export function initializeMint({
     programId: TOKEN_PROGRAM_ID,
   });
 }
+
+
+
 
 export async function createAndInitializeInstrument({
   connection,
@@ -89,9 +94,8 @@ export function createInstrument(wallet, connection, instrumentID) {
     let mint = new Account();
     createAndInitializeInstrument({
       connection,
-      owner, //change to option program ID later
+      owner, 
       mint,
       instrumentID,
     });
-
 }

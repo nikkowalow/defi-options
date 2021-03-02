@@ -1,17 +1,25 @@
 import * as BufferLayout from 'buffer-layout';
-import { 
-   Account,
-   SystemProgram, 
-   Transaction,
-   SYSVAR_RENT_PUBKEY,
-   TransactionInstruction,
-   PublicKey,
-   LAMPORTS_PER_SOL,
-   sendAndConfirmTransaction,
+import {
+  Account,
+  Connection,
+  BpfLoader,
+  BPF_LOADER_PROGRAM_ID,
+  PublicKey,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  TransactionInstruction,
+  Transaction,
+  sendAndConfirmTransaction,
+  SYSVAR_RENT_PUBKEY
 } from '@solana/web3.js';
+import fs from 'mz/fs';
 import * as solana from '../configs/solana.json';
 import {signAndSendTransaction} from './utils';
 import * as instrument from '../configs/instrument.json';
+
+
+
+
 
 export const TOKEN_PROGRAM_ID = new PublicKey(solana.programs.TOKEN_PROGRAM_ID);
 const LAYOUT = BufferLayout.union(BufferLayout.u8('instruction'));
@@ -46,6 +54,18 @@ LAYOUT.addVariant(
 );
 LAYOUT.addVariant(9, BufferLayout.struct([]), 'closeAccount');
 
+LAYOUT.addVariant(
+    9,
+    BufferLayout.struct([
+        BufferLayout.u32('underlyingAsset'),
+        BufferLayout.u32('expDate'),
+        BufferLayout.u8('strikePrice'),
+        BufferLayout.u8('pairAsset'),
+        BufferLayout.u8('lotSize'),
+        BufferLayout.u8('isCall'),
+    ]),
+    'initializeInstrument',
+)
 
 
 export const ACCOUNT_LAYOUT = BufferLayout.struct([
@@ -231,23 +251,11 @@ export async function createAndInitializeMint({
   return await signAndSendTransaction(connection, transaction, owner, signers);
 }
 
-export const mintToken = async (wallet, connection) => {
+export const createInstrument = async (wallet, connection) => {
   let mint = new Account();
   let exchange = new Account();
   await connection.requestAirdrop(exchange.publicKey, 2 * LAMPORTS_PER_SOL);
-    //   SystemProgram.createAccount({
-    //     fromPubkey: wallet.publicKey,
-    //     newAccountPubkey: exchange.publicKey,
-    //     lamports: await connection.getMinimumBalanceForRentExemption(
-    //       ACCOUNT_LAYOUT.span,
-    //     ),
-    //     space: ACCOUNT_LAYOUT.span,
-    //     programId: TOKEN_PROGRAM_ID,
-    //   });
-
-
-      let initialAccount = new Account();
-
+    let initialAccount = new Account();
     createAndInitializeMint({
       connection: connection,
       owner: exchange,
@@ -257,32 +265,99 @@ export const mintToken = async (wallet, connection) => {
       initialAccount,
       depositer: new Account()
     });
+    return [mint, initialAccount];
 }
 
 
 
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+
+
+let financerAccount;
+
+let programId;
+
+
+
+const pathToProgram = '../../program/src/target/deploy/target/';
+
+const greetedAccountDataLayout = BufferLayout.struct([
+  BufferLayout.u32('numGreets'),
+]);
+
+export async function establishPayer(connection) {
+  let financerAccount = new Account();
+  await connection.requestAirdrop(financerAccount.publicKey, LAMPORTS_PER_SOL);
+  return financerAccount;
 }
 
-export async function newAccountWithLamports(
-  connection,
-  lamports = 1000000,
-) {
-  const account = new Account();
+export async function loadProgram(wallet, connection) {
 
-  let retries = 10;
-  await connection.requestAirdrop(account.publicKey, lamports);
-  for (;;) {
-    await sleep(500);
-    if (lamports == (await connection.getBalance(account.publicKey))) {
-      return account;
-    }
-    if (--retries <= 0) {
-      break;
-    }
-    console.log(`Airdrop retry ${retries}`);
+   let financerAccount = establishPayer(connection);
+  // Check if the program has already been loaded
+  let instrumentAccount = new Account();
+
+  try {
+    programId = new PublicKey(solana.programs.DERIVATIVES_EXCHANGE_PROGRAM_ID);
+    instrumentAccount = new Account();
+    await connection.getAccountInfo(programId);
+    console.log('Program already loaded to account', programId.toBase58());
+    return;
+  } catch (err) {
+    // try to load the program
+
+  console.log('Loading hello world program...');
+  const data = await fs.readFile(pathToProgram);
+  const programAccount = new Account();
+  await BpfLoader.load(
+    connection,
+    financerAccount,
+    programAccount,
+    data,
+    BPF_LOADER_PROGRAM_ID,
+  );
+  programId = programAccount.publicKey;
+  console.log('Program loaded to account', programId.toBase58());
+
+
+  console.log('Creating instrument: ', instrumentAccount.publicKey.toBase58() + "...");
+    let keys = createInstrument(wallet, connection);
+    console.log(keys);
+}
+}
+
+//modify instrument data
+export async function sayHello(connection, instrumentAccount, financerAccount) {
+  console.log('Saying hello to', instrumentAccount.publicKey.toBase58());
+  const instruction = new TransactionInstruction({
+    keys: [{pubkey: instrumentAccount.publicKey, isSigner: false, isWritable: true}],
+    programId,
+  });
+  await sendAndConfirmTransaction(
+    connection,
+    new Transaction().add(instruction),
+    [financerAccount],
+    {
+      commitment: 'singleGossip',
+      preflightCommitment: 'singleGossip',
+    },
+  );
+}
+
+// receieve data about option to display
+export async function reportHellos(connection, instrumentAccount) {
+  const accountInfo = await connection.getAccountInfo(instrumentAccount.publicKey);
+  if (accountInfo === null) {
+    throw 'Error: cannot find instrument';
   }
-  throw new Error(`Airdrop of ${lamports} failed`);
+    const info = greetedAccountDataLayout.decode(Buffer.from(accountInfo.data));
+        console.log(
+        instrumentAccount.publicKey.toBase58(),
+            'has been greeted',
+            info.numGreets.toString(),
+            'times',
+        );
 }
+
+
+

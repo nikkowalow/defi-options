@@ -1,8 +1,7 @@
 import React, { useCallback } from "react";
 import { useWallet } from "../models/wallet";
 import { LAMPORTS_PER_SOL, Connection, PublicKey } from "@solana/web3.js";
-import { mintToken, depositCollateral } from '../utils/token.js';
-import { createInstrument } from '../utils/instrument';
+import { createInstrument, depositCollateral, loadProgram } from '../utils/token.js';
 import { useConnection } from '../models/connection';
 
 export const Mint = () => {
@@ -10,15 +9,13 @@ export const Mint = () => {
     const { wallet, connection } = useWallet();
 
 
-    const mint = async () => {
-        console.log(`OnClick - minting...`);
-        mintToken(wallet, connection);
+    const mint = () => {
+        loadProgram(wallet, connection);
     }
 
-
     const createOption = async () => {
-        console.log('creating option...');
-        createInstrument(wallet, connection, 'MAR15C57000');
+        console.log(`creating account`);
+        createInstrument(wallet, connection);
     }
 
     const transfer = async () => {

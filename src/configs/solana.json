@@ -7,5 +7,8 @@
     "programs" :{
         "TOKEN_PROGRAM_ID": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
         "DERIVATIVES_EXCHANGE_PROGRAM_ID": "dWeH9jwHRLQdkvAWQ8qJqjEDDhNV13mBqcXG2RNEpeq"
+    },
+    "accounts": {
+        "COLLATERAL_CONTAINER": "FS86giTYW3V2cgfQwC9rpnXyTiwYpyPZBX5LjbD3oTNq"
     }
 }
